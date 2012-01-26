@@ -1,16 +1,17 @@
 h1. Issue Manager
 
-p. Software para mapeamento e controle dos problemas de desenvolvimento
-Servidor desenvolvido em Ruby on Rails 3 e interface em Ext JS 4
+p. Manage problems of developing
+Server: Ruby on Rails 3
+Interface: Ext JS 4
 
-h2. Diagrama de Classes
+h2. Class Diagram
 
-!https://raw.github.com/flachadriano/issue-manager/master/issue-diagram.png!
+!https://raw.github.com/flachadriano/issue-manager/master/documentation/issue-diagram.png!
 
-h2. Banco de Dados
+h2. Data Base
 
-!https://raw.github.com/flachadriano/issue-manager/master/issue-bd.png!
+!https://raw.github.com/flachadriano/issue-manager/master/documentation/issue-bd.png!
 
-h2. Telas
+h2. Screens (Prototype)
 
-!https://raw.github.com/flachadriano/issue-manager/master/issue-telas.png!
+!https://raw.github.com/flachadriano/issue-manager/master/documentation/issue-screens.png!
