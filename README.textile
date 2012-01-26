@@ -1,7 +1,7 @@
 h1. Issue Manager
 
 p. Software para mapeamento e controle dos problemas de desenvolvimento
-p. Servidor desenvolvido em Ruby on Rails 3 e interface em Ext JS 4
+Servidor desenvolvido em Ruby on Rails 3 e interface em Ext JS 4
 
 h2. Diagrama de Classes
 
