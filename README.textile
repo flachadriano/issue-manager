@@ -14,4 +14,7 @@ h2. Data Base
 
 h2. Screens (Prototype)
 
-!https://raw.github.com/flachadriano/issue-manager/master/documentation/issue-screens.png!
+!https://raw.github.com/flachadriano/issue-manager/master/documentation/screens-portuguese/cadastros.jpg!!https://raw.github.com/flachadriano/issue-manager/master/documentation/screens-portuguese/edicao-desenvolvedor.jpg!
+!https://raw.github.com/flachadriano/issue-manager/master/documentation/screens-portuguese/edicao-solicitante.jpg!!https://raw.github.com/flachadriano/issue-manager/master/documentation/screens-portuguese/listagem.jpg!
+!https://raw.github.com/flachadriano/issue-manager/master/documentation/screens-portuguese/projeto-cadastrar.jpg!!https://raw.github.com/flachadriano/issue-manager/master/documentation/screens-portuguese/projeto-permissoes.jpg!
+!https://raw.github.com/flachadriano/issue-manager/master/documentation/screens-portuguese/usuario-cadastrar.jpg!

@@ -7,7 +7,7 @@ class CreateUsers < ActiveRecord::Migration
       t.string      :email,                      limit: 60
       t.boolean     :receive_email, null: false
       t.string      :login,         null: false, limit: 15
-      t.string      :password,      null: false, limit: 128
+      t.string      :password,      null: false
 
       t.timestamps
     end
