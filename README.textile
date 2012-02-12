@@ -7,10 +7,12 @@ Interface: Ext JS 4
 h2. Class Diagram
 
 !https://raw.github.com/flachadriano/issue-manager/master/documentation/issue-diagram.png!
+developed with https://www.lucidchart.com
 
 h2. Data Base
 
 !https://raw.github.com/flachadriano/issue-manager/master/documentation/issue-bd.png!
+developed with https://www.lucidchart.com
 
 h2. Screens (Prototype)
 
@@ -18,3 +20,4 @@ h2. Screens (Prototype)
 !https://raw.github.com/flachadriano/issue-manager/master/documentation/screens-portuguese/projeto-permissoes.jpg!!https://raw.github.com/flachadriano/issue-manager/master/documentation/screens-portuguese/listagem.jpg!
 !https://raw.github.com/flachadriano/issue-manager/master/documentation/screens-portuguese/edicao-solicitante.jpg!!https://raw.github.com/flachadriano/issue-manager/master/documentation/screens-portuguese/edicao-desenvolvedor.jpg!
 !https://raw.github.com/flachadriano/issue-manager/master/documentation/screens-portuguese/cadastros.jpg!
+developed with http://lumzy.com/app/
