@@ -2,5 +2,9 @@
 
 FactoryGirl.define do
   factory :project do
+    factory :project_finance do
+      sequence(:name) { |n| "Finance #{n}" }
+      association :created_by, factory: :user_adriano
+    end
   end
 end

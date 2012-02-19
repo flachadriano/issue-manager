@@ -1,0 +1,44 @@
+---
+/Users/adrianoflach/.rvm/gems/ruby-1.9.3-p125@issue-manager/bin/rspec .:
+  :original_result:
+    /Users/adrianoflach/Documents/projects/issue-manager/app/models/user.rb:
+    - 1
+    - 
+    - 
+    - 1
+    - 
+    - 
+    - 
+    - 
+    - 1
+    - 
+    - 1
+    - 1
+    - 
+    - 1
+    - 
+    - 
+    - 1
+    - 
+    - 1
+    - 
+    - 
+    - 
+    /Users/adrianoflach/Documents/projects/issue-manager/app/controllers/application_controller.rb:
+    - 1
+    - 1
+    - 1
+    - 
+    /Users/adrianoflach/Documents/projects/issue-manager/app/helpers/application_helper.rb:
+    - 1
+    - 
+    /Users/adrianoflach/Documents/projects/issue-manager/app/models/project.rb:
+    - 1
+    - 1
+    - 
+    /Users/adrianoflach/Documents/projects/issue-manager/app/models/sector.rb:
+    - 1
+    - 1
+    - 1
+    - 
+  :created_at: 2012-02-19 19:55:51.137708000 -02:00
