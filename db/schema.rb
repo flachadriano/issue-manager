@@ -29,6 +29,7 @@ ActiveRecord::Schema.define(:version => 20120219194140) do
   end
 
   create_table "users", :force => true do |t|
+    t.string   "email",                                :default => "", :null => false
     t.string   "encrypted_password",                   :default => "", :null => false
     t.string   "reset_password_token"
     t.datetime "reset_password_sent_at"
@@ -42,9 +43,8 @@ ActiveRecord::Schema.define(:version => 20120219194140) do
     t.string   "name",                   :limit => 50,                 :null => false
     t.integer  "sector_id"
     t.integer  "working_project_id"
-    t.string   "email",                  :limit => 60
-    t.boolean  "receive_email",                                        :null => false
-    t.string   "login",                  :limit => 15,                 :null => false
+    t.integer  "receive_email",                                        :null => false
+    t.string   "login",                  :limit => 15, :default => "", :null => false
     t.datetime "created_at"
     t.datetime "updated_at"
   end

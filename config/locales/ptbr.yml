@@ -3,6 +3,7 @@ ptbr:
         messages:
             blank: "deve ser preenchido."
             not_saved: "Os seguintes erros devem ser corrigidos:"
+            taken: "repetido. Digite outra informação"
     devise:
         sessions:
             signed_in: "Logado com sucesso."
