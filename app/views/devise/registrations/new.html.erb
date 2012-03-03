@@ -1,27 +1,27 @@
-<h2>Cadastrar Usuário</h2>
+<h2><%= t('view.sign_up.title') %></h2>
 
 <%= form_for(resource, :as => resource_name, :url => registration_path(resource_name)) do |f| %>
   <%= devise_error_messages! %>
 
-  <div><%= f.label :name, 'Nome' %> <br />
+  <div><%= f.label :name, t('view.sign_up.name') %> <br />
   <%= f.text_field :name %></div> <br />
 
-  <div><%= f.label :email, 'E-mail' %> <br />
+  <div><%= f.label :email, t('view.sign_up.email') %> <br />
   <%= f.email_field :email %></div>
 
   <div><%= f.check_box :receive_email %>
-  <%= f.label :receive_email, 'Receber notificações por e-mail' %></div> <br />
+  <%= f.label :receive_email, t('view.sign_up.receive_email') %></div> <br />
 
-  <div><%= f.label :login %> <br />
+  <div><%= f.label :login, t('view.sign_up.login') %> <br />
   <%= f.text_field :login %></div> <br />
 
-  <div><%= f.label :password, 'Senha' %><br />
+  <div><%= f.label :password, t('view.sign_up.password') %><br />
   <%= f.password_field :password %></div>
 
-  <div><%= f.label :password_confirmation, 'Confirmar senha' %> <br />
+  <div><%= f.label :password_confirmation, t('view.sign_up.password_confirmation') %> <br />
   <%= f.password_field :password_confirmation %></div> <br />
 
-  <div><%= f.submit "Sign up" %></div>
+  <div><%= f.submit t('view.sign_up.sign_up') %></div>
 <% end %>
 
 <%= render "links" %>
