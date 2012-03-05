@@ -3,7 +3,7 @@ pt-BR:
     forgot:
       title: "Esqueci minha senha"
       email: "E-mail"
-      send: "Enviar instruções para receber uma nova senha"
+      send: "Enviar instruções de reinicialização de senha"
     links:
       sign_in: "Já tenho um usuário e quero me logar"
       sign_up: "Desejo criar um usuário"
