@@ -1,12 +1,22 @@
 Ext.Loader.setPath('Ext', 'extjs/src');
+Ext.Loader.setPath('Ext.ux', 'app/ux');
 Ext.Loader.setConfig({enabled: true});
 
 Ext.application({
     name 				: 'IM',	//app namespace (from Issue Manager)
     autoCreateViewport	: true,	//automatically creates Viewport
-	models				: [],	//here goes the models
-    controllers			: [],	//here goes the controllers
-    route				: {
-		''	: 'viewport#index'
-	}
+	paths: {
+		'Ext.ux': 'app/ux'
+	},
+	requires: [
+		'Ext.ux.Router'
+	],
+    controllers			: [
+    	'Projects',
+		'Viewport'
+	],
+    routes				: {
+    	''					: 'viewport#index',
+		'projects/create'	: 'projects#window'
+    }
 });

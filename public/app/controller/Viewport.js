@@ -1,26 +1,14 @@
 /*globals Ext, t, IM, window*/
 Ext.define('IM.controller.Viewport', {
-    extend	: 'Ext.app.Controller',
-    views	: [
-		'viewport.Index'
+    extend	: 'IM.controller.Controller',
+    views   : [ 
+        'viewport.Index'
     ],
 
-// inits
-    init: function() {
+    url : 'projects',
 
-        var me = this;
-
-        me.control({
-            '#create_project': {
-                click: me.onClickCreateProject
-            }
-        });
-
-        me.callParent(arguments);
-    },
-
-// listeners
-    onClickCreateProject : function() {
-        Ext.ux.Router.redirect('http://docs.sencha.com');
+//actions
+    index: function() {
+        this.render('viewportindex');
     }
 })
