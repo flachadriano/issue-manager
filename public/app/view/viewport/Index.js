@@ -1,13 +1,9 @@
-Ext.define('IM.view.viewport.Index' ,{
-    extend: 'Ext.panel.Panel',
-    alias : 'widget.viewportindex',
+Ext.define('IM.view.viewport.Index', {
+    extend  : 'IM.view.Template',
+    alias   : 'widget.viewportindex',
     
-    layout: {
-        type    : 'vbox',
-        align   : 'center',
-        pack    : 'center'
-    },
- 
+    border  : false,
+    
     items   : [{
         xtype   : 'container',
         width   : 800,
@@ -18,11 +14,12 @@ Ext.define('IM.view.viewport.Index' ,{
             anchor  : '0'
         },
         items   : [{
-                text    : 'Criar projeto'
+                text    : 'Criar projeto',
+                action  : 'create_project'
             },{
                 text    : 'Acessar projeto',
                 margin  : '25 0 25 0',
-                itemId  : 'access_project'
+                action  : 'access_project'
             },{
                 xtype   : 'panel',
                 title   : 'Você tem convites pendentes para participar dos seguintes projetos'

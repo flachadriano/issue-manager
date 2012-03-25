@@ -17,6 +17,6 @@ Ext.application({
 	],
     routes				: {
     	''					: 'viewport#index',
-		'projects/create'	: 'projects#window'
+		'projects/create'	: 'projects#create'
     }
 });
