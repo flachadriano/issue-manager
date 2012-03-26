@@ -8,12 +8,24 @@ Ext.define('IM.controller.Projects', {
        this.control({
             'projectcreate button[action=create]': {
                 click: this.onClickBtnCreate
+            },
+            'projectcreate button[action=cancel]': {
+                click: this.onClickBtnCancel
             }
         });
+    },
+    
+// actions
+    create: function() {
+        this.render('projectcreate');
     },
 
 // listeners
     onClickBtnCreate: function(button) {
     	this.render('acesspermissionupdate');
+   },
+
+    onClickBtnCancel: function(button) {
+        this.render('viewportindex');
    }
 });

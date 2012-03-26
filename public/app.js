@@ -13,12 +13,14 @@ Ext.application({
 	],
     controllers			: [
     	'AccessPermissions',
+    	'Issues',
     	'Projects',
 		'Viewport'
 	],
     routes				: {
     	''							: 'viewport#index',
 		'projects/create'			: 'projects#create',
-		'access_permissions/update'	: 'accessPermissions#update'
+		'access_permissions/update'	: 'accessPermissions#update',
+		'issues/list'				: 'issues#list'
     }
 });
