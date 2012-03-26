@@ -1,4 +1,4 @@
-Ext.define('IM.view.project.Create',{
+Ext.define('IM.view.project.Create', {
 	extend	: 'IM.view.Template',
 	alias	: 'widget.projectcreate',
 

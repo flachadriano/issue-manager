@@ -12,11 +12,13 @@ Ext.application({
 		'Ext.ux.Router'
 	],
     controllers			: [
+    	'AccessPermissions',
     	'Projects',
 		'Viewport'
 	],
     routes				: {
-    	''					: 'viewport#index',
-		'projects/create'	: 'projects#create'
+    	''							: 'viewport#index',
+		'projects/create'			: 'projects#create',
+		'access_permissions/update'	: 'accessPermissions#update'
     }
 });

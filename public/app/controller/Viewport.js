@@ -1,10 +1,6 @@
 Ext.define('IM.controller.Viewport', {
     extend	: 'IM.controller.Controller',
-    views   : [ 
-        'viewport.Index'
-    ],
-
-    url : 'projects',
+    views   : ['viewport.Index'],
 
 // init
     init: function()
