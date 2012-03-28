@@ -6,8 +6,11 @@ Ext.define('IM.controller.Viewport', {
     init: function()
     {
        this.control({
-            'viewportindex button[action=create_project]': {
-                click: this.onClickBtnCreateProject
+            'viewportindex button[action=create]': {
+                click: this.onClickBtnCreate
+            },
+            'viewportindex button[action=access]': {
+                click: this.onClickBtnAccess
             }
         });
     },
@@ -18,7 +21,11 @@ Ext.define('IM.controller.Viewport', {
     },
 
 // listeners
-    onClickBtnCreateProject: function(button) {
+    onClickBtnCreate: function(button) {
     	this.render('projectcreate');
+   },
+
+    onClickBtnAccess: function(button) {
+        this.render('issuelist');
    }
 })

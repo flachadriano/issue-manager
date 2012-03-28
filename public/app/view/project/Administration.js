@@ -27,5 +27,10 @@ Ext.define('IM.view.project.Administration', {
                 width   : 200
             }]
         }]
+    }],
+
+    buttons : [{
+        text    : 'Avançar para a próxima etapa',
+        action  : 'create'
     }]
 });

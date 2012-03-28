@@ -8,9 +8,6 @@ Ext.define('IM.controller.AccessPermissions', {
        this.control({
             'acesspermissionupdate button[action=create]': {
                 click: this.onClickBtnCreate
-            },
-            'acesspermissionupdate button[action=cancel]': {
-                click: this.onClickBtnCancel
             }
         });
     },
@@ -22,10 +19,6 @@ Ext.define('IM.controller.AccessPermissions', {
 
 // listeners
     onClickBtnCreate: function(button) {
-    	this.render('issuelist');
-   },
-
-    onClickBtnCancel: function(button) {
-        this.render('issuelist');
+    	this.render('projectadministration');
    }
 });

@@ -14,6 +14,9 @@ Ext.define('IM.controller.Projects', {
             },
             'projectcreate button[action=cancel]': {
                 click: this.onClickBtnCancel
+            },
+            'projectadministration button[action=create]': {
+                click: this.onClickBtnForward
             }
         });
     },
@@ -34,5 +37,9 @@ Ext.define('IM.controller.Projects', {
 
     onClickBtnCancel: function(button) {
         this.render('viewportindex');
+   },
+
+    onClickBtnForward: function(button) {
+        this.render('issuelist');
    }
 });

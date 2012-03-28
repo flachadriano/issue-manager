@@ -37,10 +37,7 @@ Ext.define('IM.view.accessPermission.Update', {
     }],
 
    	buttons	: [{
-        text    : 'Pular etapa',
-        action  : 'cancel'
-    },{
-        text    : 'Adicionar permissões de acesso',
+        text    : 'Avançar para a próxima etapa >>',
         action  : 'create'
 	}]
 });

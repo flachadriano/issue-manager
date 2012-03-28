@@ -15,11 +15,11 @@ Ext.define('IM.view.viewport.Index', {
         },
         items   : [{
                 text    : 'Criar projeto',
-                action  : 'create_project'
+                action  : 'create'
             },{
                 text    : 'Acessar projeto',
                 margin  : '25 0 25 0',
-                action  : 'access_project'
+                action  : 'access'
             },{
                 xtype   : 'panel',
                 title   : 'Você tem convites pendentes para participar dos seguintes projetos'

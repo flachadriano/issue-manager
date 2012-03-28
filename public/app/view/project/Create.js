@@ -7,14 +7,15 @@ Ext.define('IM.view.project.Create', {
     items   : [{
 		xtype		: 'textfield',
         fieldLabel	: 'Nome',
+        labelWidth  : 40,
         width		: 300
     }],
 
    	buttons	: [{
-        text    : 'Voltar à tela inicial',
+        text    : '<< Voltar à tela inicial',
         action  : 'cancel'
     },{
-        text    : 'Criar projeto',
+        text    : 'Criar projeto >>',
         action  : 'create'
 	}]
 });
