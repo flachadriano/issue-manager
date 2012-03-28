@@ -47,7 +47,8 @@ Ext.define('IM.view.issue.List', {
                 xtype   : 'button'
             },
             items       : [{
-                text    : 'Cadastrar solicitação'
+                text    : 'Cadastrar solicitação',
+                action  : 'create'
             },{
                 text    : 'Atualizar listagem'
             },{

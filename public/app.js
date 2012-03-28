@@ -21,6 +21,7 @@ Ext.application({
     	''							: 'viewport#index',
 		'projects/create'			: 'projects#create',
 		'access_permissions/update'	: 'accessPermissions#update',
-		'issues/list'				: 'issues#list'
+		'issues/list'				: 'issues#list',
+		'issues/view'				: 'issues#view'
     }
 });
