@@ -1,6 +1,9 @@
 Ext.define('IM.controller.Projects', {
     extend  : 'IM.controller.Controller',
-    views   : ['project.Create'],
+    views   : [
+        'project.Administration',
+        'project.Create'
+    ],
 
 // init
     init: function()
@@ -18,6 +21,10 @@ Ext.define('IM.controller.Projects', {
 // actions
     create: function() {
         this.render('projectcreate');
+    },
+
+    administration: function() {
+        this.render('projectadministration');
     },
 
 // listeners

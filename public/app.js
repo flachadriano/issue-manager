@@ -20,6 +20,7 @@ Ext.application({
     routes				: {
     	''							: 'viewport#index',
 		'projects/create'			: 'projects#create',
+		'projects/administration'	: 'projects#administration',
 		'access_permissions/update'	: 'accessPermissions#update',
 		'issues/list'				: 'issues#list',
 		'issues/view'				: 'issues#view'
