@@ -2,7 +2,7 @@ Ext.define('IM.view.accessPermission.Update', {
 	extend	: 'IM.view.Template',
 	alias	: 'widget.acesspermissionupdate',
 
-	title	: 'Definindo permissões de acesso',
+	title	: 'Permissões de acesso',
 
     items   : [{
         xtype   : 'label',
