@@ -9,7 +9,8 @@ Ext.application({
 		'Ext.ux': 'app/ux'
 	},
 	requires: [
-		'Ext.ux.Router'
+		'Ext.ux.Router',
+		'IM.override.TextField'
 	],
     controllers			: [
     	'AccessPermissions',

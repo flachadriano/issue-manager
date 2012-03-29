@@ -5,6 +5,10 @@ Ext.define('IM.view.accessPermission.Update', {
 	title	: 'Definindo permissões de acesso',
 
     items   : [{
+        xtype   : 'label',
+        text    : 'Projeto: Teste',
+        margin  : '0 0 10 0'
+    },{
         xtype   : 'container',
         layout  : {
             type    : 'hbox'
@@ -12,21 +16,23 @@ Ext.define('IM.view.accessPermission.Update', {
         items   : [{
             xtype       : 'combobox',
             fieldLabel  : 'Usuário',
+            labelWidth  : 55,
             width       : 500
         },{
             xtype       : 'button',
+            margin      : '0 0 0 10',
             text        : 'Adicionar'
         }]
     },{
         xtype   : 'gridpanel',
         columns : [
-            {header: 'Nome'},
-            {header: 'Login'},
-            {header: 'Acessos'},
-            {header: 'Cadastros'},
-            {header: 'Remover'}
+            {header: 'Nome',flex: 1},
+            {header: 'Login',		width: 150},
+            {header: 'Acessos',		width: 50},
+            {header: 'Cadastros',	width: 60},
+            {header: 'Remover',		width: 55}
         ],
-        width   : 550,
+        width   : 570,
         height  : 200
     },{
         xtype   : 'label',
