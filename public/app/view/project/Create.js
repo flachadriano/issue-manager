@@ -8,7 +8,7 @@ Ext.define('IM.view.project.Create', {
 		xtype		: 'textfield',
         fieldLabel	: 'Nome',
         labelWidth  : 40,
-        width		: 300
+        anchor		: '0'
     }],
 
    	buttons	: [{

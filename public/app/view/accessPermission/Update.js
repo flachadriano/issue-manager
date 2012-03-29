@@ -3,43 +3,45 @@ Ext.define('IM.view.accessPermission.Update', {
 	alias	: 'widget.acesspermissionupdate',
 
 	title	: 'Permissões de acesso',
-
+    
     items   : [{
         xtype   : 'label',
-        text    : 'Projeto: Teste',
-        margin  : '0 0 10 0'
+        text    : 'Projeto: Teste'
     },{
         xtype   : 'container',
+        margin      : '10 0 0 0',
         layout  : {
-            type    : 'hbox'
+            type    : 'hbox',
+            align   : 'stretch'
         },
         items   : [{
             xtype       : 'combobox',
             fieldLabel  : 'Usuário',
             labelWidth  : 55,
-            width       : 500
+            flex        : 1
         },{
             xtype       : 'button',
-            margin      : '0 0 0 10',
-            text        : 'Adicionar'
+            margin      : '0 0 5 10',
+            text        : 'Adicionar',
         }]
     },{
         xtype   : 'gridpanel',
         columns : [
             {header: 'Nome',flex: 1},
-            {header: 'Login',		width: 150},
+            {header: 'Login',		width: 200},
             {header: 'Acessos',		width: 50},
             {header: 'Cadastros',	width: 60},
             {header: 'Remover',		width: 55}
         ],
-        width   : 570,
         height  : 200
     },{
         xtype   : 'label',
-        text    : 'Acessos - Permite cadastro de permissões de acesso'
+        text    : 'Acessos - Permite cadastro de permissões de acesso',
+        anchor  : '0'
     },{
         xtype   : 'label',
-        text    : 'Cadastros - Permite alterações dos cadastros'
+        text    : 'Cadastros - Permite alterações dos cadastros',
+        anchor  : '0'
     }],
 
    	buttons	: [{
