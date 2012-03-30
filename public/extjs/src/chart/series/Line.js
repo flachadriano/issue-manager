@@ -272,6 +272,8 @@ Ext.define('Ext.chart.series.Line', {
             chart = me.chart,
             chartAxes = chart.axes,
             store = chart.getChartStore(),
+            data = store.data.items,
+            record,
             storeCount = store.getCount(),
             surface = me.chart.surface,
             bbox = {},
@@ -427,7 +429,8 @@ Ext.define('Ext.chart.series.Line', {
         }
 
         // Extract all x and y values from the store
-        me.eachRecord(function(record, i) {
+        for (i = 0, ln = data.length; i < ln; i++) {
+            record = data[i];
             xValue = record.get(me.xField);
 
             // Ensure a value
@@ -450,7 +453,7 @@ Ext.define('Ext.chart.series.Line', {
                     Ext.global.console.warn("[Ext.chart.series.Line]  Skipping a store element with an undefined value at ", record, xValue, yValue);
                 }
                 //</debug>
-                return;
+                continue;
             }
             // Ensure a value
             if (typeof yValue == 'string' || typeof yValue == 'object' && !Ext.isDate(yValue)
@@ -461,7 +464,7 @@ Ext.define('Ext.chart.series.Line', {
             storeIndices.push(i);
             xValues.push(xValue);
             yValues.push(yValue);
-        });
+        }
 
         ln = xValues.length;
         if (ln > bbox.width) {
@@ -749,7 +752,9 @@ Ext.define('Ext.chart.series.Line', {
                         if (item) {
                             rendererAttributes = me.renderer(item, store.getAt(i), item._to, i, store);
                             item.setAttributes(Ext.apply(endMarkerStyle || {}, rendererAttributes || {}), true);
-                            item.show(true);
+                            if (!item.attr.hidden) {
+                                item.show(true);
+                            }
                         }
                     }
                 }

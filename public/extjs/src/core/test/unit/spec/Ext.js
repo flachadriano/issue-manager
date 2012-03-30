@@ -142,7 +142,7 @@ describe("Ext", function() {
            expect(Ext.apply(null, {})).toBeNull();
         });
 
-        it("should return the object if second argument is no defined", function() {
+        it("should return the object if second argument is not defined", function() {
             o = {
                 foo: 1
             };
@@ -1537,6 +1537,14 @@ describe("Ext", function() {
             expect(clone.innerHTML).toEqual(clone.innerHTML);
             expect(clone).not.toBe(node);
             document.body.removeChild(node);
+        });
+        
+        it("should return null for null items", function() {
+        	expect(Ext.clone(null)).toBeNull();
+        });
+        
+        it("should return undefined for undefined items", function() {
+        	expect(Ext.clone(undefined)).toBeUndefined();
         });
     });
 

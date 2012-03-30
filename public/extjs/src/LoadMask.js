@@ -87,6 +87,10 @@ Ext.define('Ext.LoadMask', {
     // Private. Masks are not focusable
     focusOnToFront: false,
     
+    // When we put the load mask to the front of it's owner, we generally don't want to also bring the owning
+    // component to the front.
+    bringParentToFront: false,
+    
     /**
      * Creates new LoadMask.
      * @param {Ext.Component} comp The Component you wish to mask. The the mask will be automatically sized 
@@ -96,24 +100,21 @@ Ext.define('Ext.LoadMask', {
     constructor : function(comp, config) {
         var me = this;
 
-        //<debug>
+        // Element support to be deprecated
         if (!comp.isComponent) {
+            //<debug>
             if (Ext.isDefined(Ext.global.console)) {
                 Ext.global.console.warn('Ext.LoadMask: LoadMask for elements has been deprecated, use Ext.dom.Element.mask & Ext.dom.Element.unmask');
             }
+            //</debug>
             comp = Ext.get(comp);
             this.isElement = true;
         }
-        //</debug>
 
         me.ownerCt = comp;
-        //<debug>
         if (!this.isElement) {
-        //</debug>
-        me.bindComponent(comp);
-        //<debug>
+            me.bindComponent(comp);
         }
-        //</debug>
         me.callParent([config]);
 
         if (me.store) {
@@ -330,13 +331,12 @@ Ext.define('Ext.LoadMask', {
     },
 
     hide: function(){
-        //<debug>
+        // Element support to be deprecated
         if (this.isElement) {
             this.ownerCt.unmask();
             this.fireEvent('hide', this);
             return;
         }
-        //</debug>
         delete this.showNext;  
         return this.callParent(arguments);
     },
@@ -347,13 +347,12 @@ Ext.define('Ext.LoadMask', {
     },
 
     show: function(){
-        //<debug>
+        // Element support to be deprecated
         if (this.isElement) {
             this.ownerCt.mask(this.useMsg ? this.msg : '', this.msgCls);
             this.fireEvent('show', this);
             return;
-        }
-        //</debug>  
+        } 
         return this.callParent(arguments);  
     },
 
@@ -364,6 +363,11 @@ Ext.define('Ext.LoadMask', {
 
     setZIndex: function(index) {
         var me = this;
+            
+        // If we're not on a float, don't set a z-index that will interfere with floaters
+        if (!me.activeOwner) {
+            index = 1;
+        }
         me.getMaskEl().setStyle('zIndex', index - 1);
         return me.mixins.floating.setZIndex.apply(me, arguments);
     },

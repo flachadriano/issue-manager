@@ -100,16 +100,19 @@ Ext.define('Ext.chart.axis.Category', {
     // @private creates an array of labels to be used when rendering.
     setLabels: function() {
         var store = this.chart.getChartStore(),
+            data = store.data.items,
+            d, dLen, record,
             fields = this.fields,
             ln = fields.length,
             i;
 
         this.labels = [];
-        store.each(function(record) {
+        for (d = 0, dLen = data.length; d < dLen; d++) {
+            record = data[d];
             for (i = 0; i < ln; i++) {
                 this.labels.push(record.get(fields[i]));
             }
-        }, this);
+        }
     },
 
     // @private calculates labels positions and marker positions for rendering.

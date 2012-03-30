@@ -117,7 +117,7 @@ Ext.define('Ext.menu.Menu', {
 
     /**
      * @property {Boolean} isAction
-     * `true` in this class to identify an objact as an instantiated Menu, or subclass thereof.
+     * `true` in this class to identify an object as an instantiated Menu, or subclass thereof.
      */
     isMenu: true,
 
@@ -133,10 +133,12 @@ Ext.define('Ext.menu.Menu', {
     showSeparator : true,
 
     /**
-     * @cfg {Number} minWidth
-     * The minimum width of the Menu.
+     * @cfg {Number} [minWidth=120]
+     * The minimum width of the Menu. Only applies when the {@link #floating} config is true.
      */
-    minWidth: 120,
+    minWidth: undefined,
+    
+    defaultMinWidth: 120,
 
     /**
      * @cfg {Boolean} [plain=false]
@@ -147,7 +149,8 @@ Ext.define('Ext.menu.Menu', {
         var me = this,
             prefix = Ext.baseCSSPrefix,
             cls = [prefix + 'menu'],
-            bodyCls = me.bodyCls ? [me.bodyCls] : [];
+            bodyCls = me.bodyCls ? [me.bodyCls] : [],
+            isFloating = me.floating !== false;
 
         me.addEvents(
             /**
@@ -207,14 +210,15 @@ Ext.define('Ext.menu.Menu', {
                 align: 'stretchmax',
                 overflowHandler: 'Scroller'
             };
-            
-            if (!me.floating) {
-                me.layout.align = 'stretch';
-            }
+        }
+        
+        // only apply the minWidth when we're floating & one hasn't already been set
+        if (isFloating && me.minWidth === undefined) {
+            me.minWidth = me.defaultMinWidth;
         }
 
         // hidden defaults to false if floating is configured as false
-        if (me.floating === false && me.initialConfig.hidden !== true) {
+        if (!isFloating && me.initialConfig.hidden !== true) {
             me.hidden = false;
         }
 
@@ -230,6 +234,16 @@ Ext.define('Ext.menu.Menu', {
             }
             return hasItems;
         });
+    },
+
+    beforeRender: function() {
+        this.callParent(arguments);
+
+        // Menus are usually floating: true, which means they shrink wrap their items.
+        // However, when they are contained, and not auto sized, we must stretch the items.
+        if (!this.getSizeModel().width.shrinkWrap) {
+            this.layout.align = 'stretch';
+        }
     },
 
     afterRender: function(ct) {
@@ -262,7 +276,8 @@ Ext.define('Ext.menu.Menu', {
     },
 
     afterLayout: function() {
-        var me = this;
+        var me = this,
+            innerCt, innerCtWidth, dockedItems, len, i, dockedItem, newWidth;
         me.callParent(arguments);
 
         // For IE6 & IE quirks, we have to resize the el and body since position: absolute
@@ -270,12 +285,11 @@ Ext.define('Ext.menu.Menu', {
         // document.body instead of the width of their contents.
         // This includes left/right dock items.
         if ((!Ext.isStrict && Ext.isIE) || Ext.isIE6) {
-            var innerCt = me.layout.getRenderTarget(),
-                innerCtWidth = 0,
-                dockedItems = me.dockedItems,
-                len = dockedItems.length,
-                i = 0,
-                dockedItem, newWidth;
+            innerCt = me.layout.getRenderTarget();
+            innerCtWidth = 0;
+            dockedItems = me.dockedItems;
+            len = dockedItems.length;
+            i = 0;
 
             innerCtWidth = innerCt.getWidth();
 
@@ -334,7 +348,7 @@ Ext.define('Ext.menu.Menu', {
 
     // inherit docs
     getFocusEl: function() {
-        return this.el;
+        return this.focusedItem || this.el;
     },
 
     // inherit docs

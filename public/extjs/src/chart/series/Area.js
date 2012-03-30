@@ -169,6 +169,8 @@ Ext.define('Ext.chart.series.Area', {
         var me = this,
             chart = me.chart,
             store = chart.getChartStore(),
+            data = store.data.items,
+            i, l, record,
             areas = [].concat(me.yField),
             areasLen = areas.length,
             xValues = [],
@@ -213,7 +215,8 @@ Ext.define('Ext.chart.series.Area', {
             maxY = 0;
         }
 
-        store.each(function(record, i) {
+        for (i = 0, l = data.length; i < l; i++) {
+            record = data[i];
             xValue = record.get(me.xField);
             yValue = [];
             if (typeof xValue != 'number') {
@@ -237,7 +240,7 @@ Ext.define('Ext.chart.series.Area', {
             maxX = mmax(maxX, xValue);
             maxY = mmax(maxY, acumY);
             yValues.push(yValue);
-        }, me);
+        }
 
         xScale = bbox.width / ((maxX - minX) || 1);
         yScale = bbox.height / ((maxY - minY) || 1);

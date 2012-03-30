@@ -6,14 +6,16 @@
  */
 Ext.define('Ext.grid.header.Container', {
     extend: 'Ext.container.Container',
-    uses: [
+    requires: [
         'Ext.grid.ColumnLayout',
+        'Ext.grid.plugin.HeaderResizer',
+        'Ext.grid.plugin.HeaderReorderer'
+    ],
+    uses: [
         'Ext.grid.column.Column',
         'Ext.menu.Menu',
         'Ext.menu.CheckItem',
-        'Ext.menu.Separator',
-        'Ext.grid.plugin.HeaderResizer',
-        'Ext.grid.plugin.HeaderReorderer'
+        'Ext.menu.Separator'
     ],
     border: true,
 
@@ -105,15 +107,14 @@ Ext.define('Ext.grid.header.Container', {
         // Only set up a Resizer and Reorderer for the topmost HeaderContainer.
         // Nested Group Headers are themselves HeaderContainers
         if (!me.isHeader) {
-            me.resizer   = new Ext.grid.plugin.HeaderResizer();
-            me.reorderer = new Ext.grid.plugin.HeaderReorderer();
-            if (!me.enableColumnResize) {
-                me.resizer.disable();
+            if (me.enableColumnResize) {
+                me.resizer = new Ext.grid.plugin.HeaderResizer();
+                me.plugins.push(me.resizer);
             }
-            if (!me.enableColumnMove) {
-                me.reorderer.disable();
+            if (me.enableColumnMove) {
+                me.reorderer = new Ext.grid.plugin.HeaderReorderer();
+                me.plugins.push(me.reorderer);
             }
-            me.plugins.push(me.reorderer, me.resizer);
         }
 
         // Base headers do not need a box layout
@@ -212,12 +213,15 @@ Ext.define('Ext.grid.header.Container', {
             return;
         }
 
-        var me = this,
-            i = 0,
-            index,
-            col;
+        var me     = this,
+            i      = 0,
+            length = columns.length,
+            c,
+            index, col, columnState;
 
-        Ext.each(columns, function (columnState) {
+        for (c = 0; c < length; c++) {
+            columnState = columns[i];
+
             col = me.down('gridcolumn[headerId=' + columnState.id + ']');
             if (col) {
                 index = me.items.indexOf(col);
@@ -230,7 +234,7 @@ Ext.define('Ext.grid.header.Container', {
                 }
                 ++i;
             }
-        });
+        }
     },
 
     getColumnsState: function () {
@@ -258,7 +262,9 @@ Ext.define('Ext.grid.header.Container', {
         }
         //<debug warn>
         if (Ext.global.console && Ext.global.console.warn) {
-            if (!me._usedIDs) me._usedIDs = {};
+            if (!me._usedIDs) {
+                me._usedIDs = {};
+            }
             if (me._usedIDs[c.headerId]) {
                 Ext.global.console.warn(this.$className, 'attempted to reuse an existing id', c.headerId);
             }
@@ -492,12 +498,16 @@ Ext.define('Ext.grid.header.Container', {
     onHeaderResize: function(header, w, suppressFocus) {
         var me = this,
             view = me.view,
+            gridSection = me.ownerCt,
             viewEl;
 
         // Do not react to header sizing during initial Panel layout when there is no view content to size.
         if (view && (viewEl = view.el) && viewEl.dom.firstChild) {
             me.tempLock();
             view.onHeaderResize(header, w, suppressFocus);
+            if (gridSection) {
+                gridSection.onHeaderResize(me, header, w);
+            }
         }
         me.fireEvent('columnresize', this, header, w);
     },
@@ -893,12 +903,6 @@ Ext.define('Ext.grid.header.Container', {
             headerId = header.id;
             renderer = header.renderer;
             value = data[header.dataIndex];
-
-            // When specifying a renderer as a string, it always resolves
-            // to Ext.util.Format
-            if (typeof renderer == "string") {
-                header.renderer = renderer = Ext.util.Format[renderer];
-            }
 
             if (typeof renderer == "function") {
                 value = renderer.call(

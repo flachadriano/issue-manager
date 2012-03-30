@@ -11,7 +11,7 @@ Ext.define('Ext.layout.Layout', {
 
     /**
      * @property {Boolean} isLayout
-     * `true` in this class to identify an objact as an instantiated Layout, or subclass thereof.
+     * `true` in this class to identify an object as an instantiated Layout, or subclass thereof.
      */
     isLayout: true,
     initialized: false,
@@ -430,11 +430,12 @@ Ext.define('Ext.layout.Layout', {
         var itemDom = item.el ? item.el.dom : Ext.getDom(item),
             targetDom = (target && target.dom) || target;
 
+        // Test DOM nodes for equality using "===" : http://jsperf.com/dom-equality-test
         if (itemDom && targetDom) {
             if (typeof position == 'number') {
-                return itemDom == targetDom.childNodes[position];
+                return itemDom === targetDom.childNodes[position];
             }
-            return itemDom.parentNode == targetDom;
+            return itemDom.parentNode === targetDom;
         }
 
         return false;
@@ -469,7 +470,6 @@ Ext.define('Ext.layout.Layout', {
      * @private
      */
     moveItem : function(item, target, position) {
-        // Make sure target is a dom element
         target = target.dom || target;
         if (typeof position == 'number') {
             position = target.childNodes[position];
@@ -530,7 +530,7 @@ Ext.define('Ext.layout.Layout', {
             removeClasses;
 
         if (item.rendered) {
-            removeClasses = me.itemCls || [];
+            removeClasses = [].concat(me.itemCls || []);
             if (owner.itemCls) {
                 removeClasses = Ext.Array.push(removeClasses, owner.itemCls);
             }
@@ -556,10 +556,11 @@ Ext.define('Ext.layout.Layout', {
      * @protected
      */
     destroy : function() {
-        var me = this;
+        var me = this,
+            target;
 
         if (me.targetCls) {
-            var target = me.getTarget();
+            target = me.getTarget();
             if (target) {
                 target.removeCls(me.targetCls);
             }

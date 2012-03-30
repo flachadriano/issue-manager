@@ -174,10 +174,30 @@ Ext.define('Ext.form.Panel', {
         me.callParent();
 
         me.relayEvents(me.form, [
+            /**
+             * @event beforeaction
+             * @inheritdoc Ext.form.Basic#beforeaction
+             */
             'beforeaction',
+            /**
+             * @event actionfailed
+             * @inheritdoc Ext.form.Basic#actionfailed
+             */
             'actionfailed',
+            /**
+             * @event actioncomplete
+             * @inheritdoc Ext.form.Basic#actioncomplete
+             */
             'actioncomplete',
+            /**
+             * @event validitychange
+             * @inheritdoc Ext.form.Basic#validitychange
+             */
             'validitychange',
+            /**
+             * @event dirtychange
+             * @inheritdoc Ext.form.Basic#dirtychange
+             */
             'dirtychange'
         ]);
 
@@ -299,8 +319,13 @@ Ext.define('Ext.form.Panel', {
      * {@link Ext.form.field.Field#checkChange check if its value has changed}.
      */
     checkChange: function() {
-        this.form.getFields().each(function(field) {
-            field.checkChange();
-        });
+        var fields = this.form.getFields().items,
+            f,
+            fLen   = fields.length,
+            field;
+
+        for (f = 0; f < fLen; f++) {
+            fields[f].checkChange();
+        }
     }
 });

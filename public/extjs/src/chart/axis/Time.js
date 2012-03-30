@@ -105,6 +105,8 @@ Ext.define('Ext.chart.axis.Time', {
     doConstrain: function () {
         var me = this,
             store = me.chart.store,
+            items = store.data.items,
+            d, dLen, record,
             data = [],
             series = me.chart.series.items,
             math = Math,
@@ -114,21 +116,23 @@ Ext.define('Ext.chart.axis.Time', {
             ln = fields.length,
             range = me.getRange(),
             min = range.min, max = range.max, i, l, excludes = [],
-            value, values, rec, data = [];
+            value, values, rec;
         for (i = 0, l = series.length; i < l; i++) {
             excludes[i] = series[i].__excludes;
         }
-        store.each(function(record) {
+        for (d = 0, dLen = items.length; d < dLen; d++) {
+            record = items[d];
             for (i = 0; i < ln; i++) {
                 if (excludes[i]) {
                     continue;
                 }
                 value = record.get(fields[i]);
-                if (+value < +min) return;
-                if (+value > +max) return;
+                value = +value;
+                if (value >= +min && value <= +max) {
+                    data.push(record);
+                }
             }
-            data.push(record);
-        })
+        }
         me.chart.substore = Ext.create('Ext.data.JsonStore', { model: store.model, data: data });
     },
 

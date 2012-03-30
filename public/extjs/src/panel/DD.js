@@ -1,4 +1,7 @@
-// private - DD implementation for Panels
+/**
+ * DD implementation for Panels.
+ * @private
+ */
 Ext.define('Ext.panel.DD', {
     extend: 'Ext.dd.DragSource',
     requires: ['Ext.panel.Proxy'],

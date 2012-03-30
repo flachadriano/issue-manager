@@ -17,7 +17,7 @@
  * To display one "active" item at full size from a choice of several child items, use
  * {@link Ext.layout.container.Card card layout}.
  *
- * Inner layouts are available by virtue of the fact that all {@link Ext.panel.Panel Panel}s
+ * Inner layouts are available because all {@link Ext.panel.Panel Panel}s
  * added to the Viewport, either through its {@link #cfg-items}, or the {@link #method-add}
  * method of any of its child Panels may themselves have a layout.
  *
@@ -32,7 +32,6 @@
  *         items: [{
  *             region: 'north',
  *             html: '<h1 class="x-panel-header">Page Title</h1>',
- *             autoHeight: true,
  *             border: false,
  *             margins: '0 0 5 0'
  *         }, {
@@ -98,11 +97,6 @@ Ext.define('Ext.container.Viewport', {
      */
 
     /**
-     * @cfg {Boolean} hideParent
-     * @private
-     */
-
-    /**
      * @cfg {Number} height
      * Sets itself to viewport width.
      * @private
@@ -111,16 +105,6 @@ Ext.define('Ext.container.Viewport', {
     /**
      * @cfg {Number} width
      * Sets itself to viewport height.
-     * @private
-     */
-
-    /**
-     * @cfg {Boolean} autoHeight
-     * @private
-     */
-
-    /**
-     * @cfg {Boolean} autoWidth
      * @private
      */
 
@@ -136,11 +120,13 @@ Ext.define('Ext.container.Viewport', {
 
     /**
      * @property {Boolean} isViewport
-     * `true` in this class to identify an objact as an instantiated Viewport, or subclass thereof.
+     * `true` in this class to identify an object as an instantiated Viewport, or subclass thereof.
      */
     isViewport: true,
 
     ariaRole: 'application',
+    
+    preserveElOnDestroy: true,
 
     initComponent : function() {
         var me = this,

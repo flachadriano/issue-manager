@@ -606,6 +606,16 @@ Ext.define('Ext.view.View', {
         }
     },
     
+    onAdd: function() {
+        this.callParent(arguments);
+        this.refreshHeight();
+    },
+    
+    onRemove: function(){
+        this.callParent(arguments);
+        this.refreshHeight();
+    },
+    
     onUpdate: function(store, record){
         var me = this,
             node = me.getNode(record),

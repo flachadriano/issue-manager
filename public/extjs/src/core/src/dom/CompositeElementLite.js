@@ -84,7 +84,7 @@ Ext.define('Ext.dom.CompositeElementLite', {
 
     /**
      * @property {Boolean} isComposite
-     * `true` in this class to identify an objact as an instantiated CompositeElement, or subclass thereof.
+     * `true` in this class to identify an object as an instantiated CompositeElement, or subclass thereof.
      */
     isComposite: true,
 
@@ -197,10 +197,10 @@ Ext.define('Ext.dom.CompositeElementLite', {
      * @return {Ext.dom.CompositeElement} this
      */
     each: function(fn, scope) {
-        var me = this,
-                els = me.elements,
-                len = els.length,
-                i, e;
+        var me  = this,
+            els = me.elements,
+            len = els.length,
+            i, e;
 
         for (i = 0; i < len; i++) {
             e = els[i];
@@ -236,18 +236,26 @@ Ext.define('Ext.dom.CompositeElementLite', {
      * @return {Ext.dom.CompositeElement} this
      */
     filter: function(selector) {
-        var els = [],
-                me = this,
-                fn = Ext.isFunction(selector) ? selector
-                        : function(el) {
-                    return el.is(selector);
-                };
+        var me  = this,
+            els = [],
+            len = els.length,
+            i, e;
 
-        me.each(function(el, self, i) {
-            if (fn(el, i) !== false) {
-                els[els.length] = me.transformElement(el);
+        for (i = 0; i < len; i++) {
+            e = els[i];
+
+            if (e) {
+                e = me.getElement(e);
+
+                if (typeof selector == 'function') {
+                    if (selector.call(e, e, me, i) === false) {
+                        break;
+                    }
+                } else if (e.is(selector) === false) {
+                    break;
+                }
             }
-        });
+        }
 
         me.elements = els;
         return me;
@@ -302,11 +310,13 @@ Ext.define('Ext.dom.CompositeElementLite', {
             els = Ext.dom.Element.selectorFunction(els, root);
         }
 
-        var yels = this.elements;
+        var yels = this.elements,
+            eLen = els.length,
+            e;
 
-        Ext.each(els, function(e) {
-            yels.push(Ext.get(e));
-        });
+        for (e = 0; e < eLen; e++) {
+            yels.push(Ext.get(els[e]));
+        }
 
         return this;
     },
@@ -345,23 +355,27 @@ Ext.define('Ext.dom.CompositeElementLite', {
      * @return {Ext.dom.CompositeElement} this
      */
     removeElement: function(keys, removeDom) {
-        var me = this,
-                elements = this.elements,
-                el;
+        keys = [].concat(keys);
 
-        Ext.each(keys, function(val) {
+        var me       = this,
+            elements = this.elements,
+            kLen     = keys.length,
+            val, el, k;
+
+        for (k = 0; k < kLen; k++) {
+            val = keys[k];
+
             if ((el = (elements[val] || elements[val = me.indexOf(val)]))) {
                 if (removeDom) {
                     if (el.dom) {
                         el.remove();
-                    }
-                    else {
+                    } else {
                         Ext.removeNode(el);
                     }
                 }
                 Ext.Array.erase(elements, val, 1);
             }
-        });
+        }
 
         return this;
     }

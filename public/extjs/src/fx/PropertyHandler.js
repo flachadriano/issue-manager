@@ -1,6 +1,5 @@
 /**
- * @class Ext.fx.PropertyHandler
- * @ignore
+ * @private
  */
 Ext.define('Ext.fx.PropertyHandler', {
 
@@ -94,15 +93,18 @@ Ext.define('Ext.fx.PropertyHandler', {
 
             parseColor : function(color, damper) {
                 damper = (typeof damper == 'number') ? damper : 1;
-                var base,
-                    out = false,
-                    match;
+                var out    = false,
+                    reList = [this.hexRE, this.rgbRE, this.hex3RE],
+                    length = reList.length,
+                    match, base, re, i;
 
-                Ext.each([this.hexRE, this.rgbRE, this.hex3RE], function(re, idx) {
-                    base = (idx % 2 == 0) ? 16 : 10;
+                for (i = 0; i < length; i++) {
+                    re = reList[i];
+
+                    base = (i % 2 === 0) ? 16 : 10;
                     match = re.exec(color);
-                    if (match && match.length == 4) {
-                        if (idx == 2) {
+                    if (match && match.length === 4) {
+                        if (i === 2) {
                             match[1] += match[1];
                             match[2] += match[2];
                             match[3] += match[3];
@@ -112,9 +114,10 @@ Ext.define('Ext.fx.PropertyHandler', {
                             green: parseInt(match[2], base),
                             blue: parseInt(match[3], base)
                         };
-                        return false;
+                        break;
                     }
-                });
+                }
+
                 return out || color;
             },
 
@@ -316,17 +319,23 @@ Ext.define('Ext.fx.PropertyHandler', {
         /* End Definitions */
     }
 }, function() {
-    Ext.each([
-        'outlineColor',
-        'backgroundColor',
-        'borderColor',
-        'borderTopColor',
-        'borderRightColor', 
-        'borderBottomColor', 
-        'borderLeftColor',
-        'fill',
-        'stroke'
-    ], function(prop) {
+    var props  = [
+            'outlineColor',
+            'backgroundColor',
+            'borderColor',
+            'borderTopColor',
+            'borderRightColor',
+            'borderBottomColor',
+            'borderLeftColor',
+            'fill',
+            'stroke'
+        ],
+        length = props.length,
+        i      = 0,
+        prop;
+
+    for (; i<length; i++) {
+        prop = props[i];
         this[prop] = this.color;
-    }, this);
+    }
 });

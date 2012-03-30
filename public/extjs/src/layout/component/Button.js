@@ -32,18 +32,30 @@ Ext.define('Ext.layout.component.Button', {
     },
 
     beginLayoutCycle: function(ownerContext) {
-        var empty = '',
-            owner = this.owner;
+        var me = this,
+            empty = '',
+            owner = me.owner,
+            btnEl = owner.btnEl,
+            btnInnerEl = owner.btnInnerEl,
+            text = owner.text;
 
-        this.callParent(arguments);
+        me.callParent(arguments);
 
-        owner.btnInnerEl.setStyle('overflow', empty);
+        btnInnerEl.setStyle('overflow', empty);
 
         // Clear all element widths
-        owner.el.setStyle('width', empty);
-        owner.btnEl.setStyle('width', empty);
-        owner.btnInnerEl.setStyle('width', empty);
+        if (!ownerContext.widthModel.natural) {
+            owner.el.setStyle('width', empty);
+        }
+        btnEl.setStyle('width', empty);
+        btnInnerEl.setStyle('width', empty);
         owner.btnIconEl.setStyle('width', empty);
+        
+        if (ownerContext.heightModel.shrinkWrap && text && me.htmlRE.test(text)) {
+            btnInnerEl.setStyle('line-height', 'normal');
+            btnInnerEl.setStyle('height', 'auto');
+            btnEl.setStyle('height', 'auto');
+        }
     },
 
     calculateOwnerHeightFromContentHeight: function (ownerContext, contentHeight) {
@@ -138,9 +150,10 @@ Ext.define('Ext.layout.component.Button', {
         // we only do it if the text contains markup.
         if (text && me.htmlRE.test(text)) {
             btnInnerItem.setProp('line-height', 'normal');
+            btnInnerEl.setStyle('line-height', 'normal');
             textHeight = Ext.util.TextMetrics.measure(btnInnerEl, text).height;
             btnInnerItem.setProp('padding-top',
-                me.btnFrameTop + Math.max(btnInnerEl.getHeight() - btnFrameHeight - textHeight, 0) / 2);
+                me.btnFrameTop + Math.max(btnHeight - btnFrameHeight - textHeight, 0) / 2);
             btnInnerItem.setHeight(btnHeight);
         }
     },

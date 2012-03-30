@@ -307,7 +307,7 @@ Ext.define('Ext.grid.feature.Grouping', {
     getMenuItems: function() {
         var me                 = this,
             groupByText        = me.groupByText,
-            disabled           = me.disabled,
+            disabled           = me.disabled || !me.getGroupField(),
             showGroupsText     = me.showGroupsText,
             enableNoGroups     = me.enableNoGroups,
             groupMenuItemClick = Ext.Function.bind(me.onGroupMenuItemClick, me),
@@ -453,12 +453,18 @@ Ext.define('Ext.grid.feature.Grouping', {
      * Expand all groups
      */
     expandAll: function(){
-        var me = this,
-            view = me.view;
-            
-        view.el.select(me.eventSelector).each(function(group){
-            me.expand(group.next(), true);
-        });
+        var me   = this,
+            view = me.view,
+            groups = view.el.select(me.eventSelector),
+            els    = groups.elements,
+            e,
+            eLen   = els.length,
+            group;
+
+        for (e = 0; e < eLen; e++) {
+            me.expand(Ext.fly(els[e]).next(), true);
+        }
+
         view.refreshHeight();
     },
 
@@ -493,13 +499,19 @@ Ext.define('Ext.grid.feature.Grouping', {
     /**
      * Collapse all groups
      */
-    collapseAll: function(){
-        var me = this,
-            view = me.view;
-            
-        view.el.select(me.eventSelector).each(function(group){
-            me.collapse(group.next(), true);
-        });
+    collapseAll: function() {
+        var me     = this,
+            view   = me.view,
+            groups = view.el.select(me.eventSelector),
+            els    = groups.elements,
+            e,
+            eLen   = els.length,
+            group;
+
+        for (e = 0; e < eLen; e++) {
+            me.collapse(Ext.fly(els[e]).next(), true);
+        }
+
         view.refreshHeight();
     },
     
@@ -616,20 +628,25 @@ Ext.define('Ext.grid.feature.Grouping', {
             header = me.getGroupedHeader(),
             groupField = me.getGroupField(),
             index = -1,
-            rec;
+            r,
+            rLen = records.length,
+            record;
             
         group.viewId = view.id;
 
-        Ext.Array.each(records, function(record, idx) {
+        for (r = 0; r < rLen; r++) {
+            record = records[r];
+
             if (record.get(groupField) == group.name) {
-                index = idx;
+                index = r;
             }
             if (Ext.Array.indexOf(children, record) != -1) {
-                rows.push(Ext.apply(preppedRecords[idx], {
-                    depth: 1
+                rows.push(Ext.apply(preppedRecords[r], {
+                    depth : 1
                 }));
             }
-        });
+        }
+
         delete group.children;
         group.fullWidth = fullWidth;
         group.columnName = header ? header.text : groupField;
@@ -650,13 +667,19 @@ Ext.define('Ext.grid.feature.Grouping', {
     collectData: function(records, preppedRecords, startIndex, fullWidth, o) {
         var me    = this,
             store = me.view.store,
-            groups;
+            g,
+            groups, gLen, group;
             
         if (!me.disabled && store.isGrouped()) {
             groups = store.getGroups();
-            Ext.Array.each(groups, function(group, idx){
+            gLen   = groups.length;
+
+            for (g = 0; g < gLen; g++) {
+                group = groups[g];
+
                 me.getGroupRows(group, records, preppedRecords, fullWidth);
-            }, me);
+            }
+
             return {
                 rows: groups,
                 fullWidth: fullWidth

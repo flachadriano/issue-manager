@@ -196,7 +196,7 @@ Ext.supports = {
      * @property CSS3BoxShadow True if document environment supports the CSS3 box-shadow style.
      * @type {Boolean}
      */
-    CSS3BoxShadow: 'boxShadow' in document.documentElement.style,
+    CSS3BoxShadow: 'boxShadow' in document.documentElement.style || 'WebkitBoxShadow' in document.documentElement.style || 'MozBoxShadow' in document.documentElement.style,
 
     /**
      * @property ClassList True if document environment supports the HTML5 classList API.
@@ -223,6 +223,17 @@ Ext.supports = {
     // is.Desktop is needed due to the bug in Chrome 5.0.375, Safari 3.1.2
     // and Safari 4.0 (they all have 'ontouchstart' in the window object).
     Touch: ('ontouchstart' in window) && (!Ext.is.Desktop),
+    
+    /**
+     * @property TimeoutActualLateness True if the browser passes the "actualLateness" parameter to
+     * setTimeout. See: https://developer.mozilla.org/en/DOM/window.setTimeout
+     * @type {Boolean}
+     */
+    TimeoutActualLateness: (function(){
+        setTimeout(function(){
+            Ext.supports.TimeoutActualLateness = arguments.length !== 0;
+        }, 0);
+    })(), 
 
     tests: [
         /**
@@ -446,7 +457,8 @@ Ext.supports = {
                     webkit   = '-webkit-gradient(linear, left top, right bottom, from(black), to(white))',
                     w3c      = 'linear-gradient(left top, black, white)',
                     moz      = '-moz-' + w3c,
-                    options  = [property + webkit, property + w3c, property + moz];
+                    opera    = '-o-' + w3c,
+                    options  = [property + webkit, property + w3c, property + moz, property + opera];
                 
                 div.style.cssText = options.join(';');
                 

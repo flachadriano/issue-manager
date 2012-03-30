@@ -414,6 +414,8 @@ Ext.define('Ext.view.AbstractView', {
         var me = this,
             targetEl,
             targetParent,
+            nextSibling,
+            dom,
             records;
 
         if (!me.rendered || me.isDestroyed) {
@@ -423,13 +425,15 @@ Ext.define('Ext.view.AbstractView', {
         me.fireEvent('beforerefresh', me);
         targetEl = me.getTargetEl();
         records = me.store.getRange();
+        dom = targetEl.dom;
 
         // Updating is much quicker if done when the targetEl is detached from the document, and not displayed.
         // But this resets the scroll position, so when preserving scroll position, this cannot be done.
         if (!me.preserveScrollOnRefresh) {
-            targetParent = targetEl.dom.parentNode;
-            targetEl.dom.style.display = 'none';
-            targetParent.removeChild(targetEl.dom);
+            targetParent = dom.parentNode;
+            dom.style.display = 'none';
+            nextSibling = dom.nextSibling;
+            targetParent.removeChild(dom);
         }
 
         if (me.refreshCounter) {
@@ -461,8 +465,8 @@ Ext.define('Ext.view.AbstractView', {
         me.hasSkippedEmptyText = true;
 
         if (!me.preserveScrollOnRefresh) {
-            targetParent.appendChild(targetEl.dom);
-            targetEl.dom.style.display = '';
+            targetParent.insertBefore(dom, nextSibling);
+            dom.style.display = '';
         }
 
         me.fireEvent('refresh', me);
@@ -602,7 +606,9 @@ Ext.define('Ext.view.AbstractView', {
                 // Maintain selection after update
                 // TODO: Move to approriate event handler.
                 me.selModel.refresh();
-                me.fireEvent('itemupdate', record, index, node);
+                if (me.hasListeners.itemupdate) {
+                    me.fireEvent('itemupdate', record, index, node);
+                }
                 return node;
             }
         }
@@ -626,7 +632,9 @@ Ext.define('Ext.view.AbstractView', {
 
         me.selModel.refresh();
         me.updateIndexes(index);
-        me.fireEvent('itemadd', records, index, nodes);
+        if (me.hasListeners.itemadd) {
+            me.fireEvent('itemadd', records, index, nodes);
+        }
     },
 
     doAdd: function(nodes, records, index) {
@@ -655,7 +663,9 @@ Ext.define('Ext.view.AbstractView', {
         if (me.store.getCount() === 0){
             me.refresh();
         }
-        me.fireEvent('itemremove', record, index);
+        if (me.hasListeners.itemremove) {
+            me.fireEvent('itemremove', record, index);
+        }
     },
 
     doRemove: function(record, index) {
@@ -705,11 +715,12 @@ Ext.define('Ext.view.AbstractView', {
         // Bind the store to our selection model
         me.getSelectionModel().bindStore(me.store);
 
-        // 4.1.0: Always refresh regardless of record count.
+        // 4.1.0: If the Store is *NOT* already loading (a refresh is on the way), then
+        // on render, refresh regardless of record count.
         // Template may contain boilerplate HTML outside of record iteration loop.
         // Also, emptyText is appended by the refresh method.
         // We call refresh on a defer if this is the initial call, and we are configured to defer the initial refresh.
-        if (store) {
+        if (store && !store.loading) {
             if (initial && me.deferInitialRefresh) {
                 Ext.Function.defer(function () {
                     if (!me.isDestroyed) {

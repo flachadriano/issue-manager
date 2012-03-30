@@ -240,16 +240,22 @@ Ext.define('Ext.form.field.Date', {
     // private
     initDisabledDays : function(){
         if(this.disabledDates){
-            var dd = this.disabledDates,
-                len = dd.length - 1,
-                re = "(?:";
+            var dd   = this.disabledDates,
+                len  = dd.length - 1,
+                re   = "(?:",
+                d,
+                dLen = dd.length,
+                date;
 
-            Ext.each(dd, function(d, i){
-                re += Ext.isDate(d) ? '^' + Ext.String.escapeRegex(d.dateFormat(this.format)) + '$' : dd[i];
-                if (i !== len) {
+            for (d = 0; d < dLen; d++) {
+                date = dd[d];
+
+                re += Ext.isDate(date) ? '^' + Ext.String.escapeRegex(date.dateFormat(this.format)) + '$' : date;
+                if (d !== len) {
                     re += '|';
                 }
-            }, this);
+            }
+
             this.disabledDatesRE = new RegExp(re + ')');
         }
     },

@@ -65,7 +65,7 @@ bodyCls: ['foo', 'bar']
 
     /**
      * @property {Boolean} isPanel
-     * `true` in this class to identify an objact as an instantiated Panel, or subclass thereof.
+     * `true` in this class to identify an object as an instantiated Panel, or subclass thereof.
      */
     isPanel: true,
 
@@ -205,8 +205,8 @@ var panel = new Ext.panel.Panel({
     },
 
     /**
-     * Parses the {@link bodyStyle} config if available to create a style string that will be applied to the body element.
-     * This also includes {@link bodyPadding} and {@link bodyBorder} if available.
+     * Parses the {@link #bodyStyle} config if available to create a style string that will be applied to the body element.
+     * This also includes {@link #bodyPadding} and {@link #bodyBorder} if available.
      * @return {String} A CSS style string with body styles, padding and border.
      * @private
      */
@@ -264,7 +264,7 @@ var panel = new Ext.panel.Panel({
     },
 
     // inherit docs
-    addUIClsToElement: function(cls, force) {
+    addUIClsToElement: function(cls) {
         var me = this,
             result = me.callParent(arguments);
 
@@ -273,7 +273,7 @@ var panel = new Ext.panel.Panel({
     },
 
     // inherit docs
-    removeUIClsFromElement: function(cls, force) {
+    removeUIClsFromElement: function(cls) {
         var me = this,
             result = me.callParent(arguments);
 
@@ -282,7 +282,7 @@ var panel = new Ext.panel.Panel({
     },
 
     // inherit docs
-    addUIToElement: function(force) {
+    addUIToElement: function() {
         var me = this;
 
         me.callParent(arguments);

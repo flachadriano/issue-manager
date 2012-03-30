@@ -111,11 +111,21 @@ Ext.define('Ext.form.field.Picker', {
 
     // private
     onEsc: function(e) {
-        // Only stop the ESC key event if it's not going to bubble up to the FocusManager
-        if (!Ext.FocusManager || !Ext.FocusManager.enabled) {
+        var me = this;
+        if (me.isExpanded) {
+            me.collapse();
             e.stopEvent();
+        } else {
+            // If there's an ancestor Window which will see the ESC event and hide, ensure this Field blurs
+            // so that a down arrow will not pop up a disembodied dropdown list.
+            if (me.up('window')) {
+                me.blur();
+            }
+            // Otherwise, only stop the ESC key event if it's not going to bubble up to the FocusManager
+            else if ((!Ext.FocusManager || !Ext.FocusManager.enabled)) {
+                e.stopEvent();
+            }
         }
-        this.collapse();
     },
 
     onDownArrow: function(e) {

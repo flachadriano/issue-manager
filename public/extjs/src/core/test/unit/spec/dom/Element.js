@@ -670,3 +670,18 @@ describe("Ext.dom.Element", function() {
         });
     });
 }, "/src/dom/Element.js");
+
+describe("Ext.dom.Element", function(){
+    var unAttached;
+
+    beforeEach(function(){
+        unAttached = document.createElement('div');
+    });
+
+    describe("getXY", function(){
+        it("should not throw when reading unattached element", function(){
+            Ext.fly(unAttached).getXY();
+        });
+    });
+
+});

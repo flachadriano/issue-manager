@@ -100,7 +100,7 @@ describe("Ext.Number", function(){
         var snap = Number.snap;
 
         it("should enforce minValue if increment is zero", function(){
-            expect(snap(50, 0, 0, 100)).toEqual(50);
+            expect(snap(40, 0, 50, 100)).toEqual(50);
         });
 
         it("should enforce maxValue if increment is zero", function(){
@@ -138,56 +138,123 @@ describe("Ext.Number", function(){
         it("should round to the nearest snap point", function(){
             expect(snap(4, 5, 0, 100)).toEqual(5);
         });
+        
+        it("should snap negative numbers", function() {
+           expect(snap(-9, 10, -100, 0)).toBe(-10);
+           expect(snap(-1, 10, -100, 0)).toBe(0);
+        });
 
     });
 
     describe("snapInRange", function(){
 
         // Params are (value, snapincrement, minValue, maxValue)
-        var snap = Number.snapInRange;
+        var snapInRange = Number.snapInRange;
 
         it("should enforce minValue if increment is zero", function(){
-            expect(snap(50, 0, 0, 100)).toEqual(50);
+            expect(snapInRange(50, 0, 0, 100)).toEqual(50);
         });
 
         it("should enforce maxValue if increment is zero", function(){
-            expect(snap(5000, 0, 0, 100)).toEqual(100);
+            expect(snapInRange(5000, 0, 0, 100)).toEqual(100);
         });
 
         it("should enforce minValue if passed", function(){
-            expect(snap(0, 2, 1, 100)).toEqual(1);
+            expect(snapInRange(0, 2, 1, 100)).toEqual(1);
         });
 
         it("should not enforce a minimum if no minValue passed", function(){
-            expect(snap(21, 2, undefined, 100)).toEqual(22);
+            expect(snapInRange(21, 2, undefined, 100)).toEqual(22);
         });
 
         it("should enforce maxValue if passed", function(){
-            expect(snap(1000, 2, undefined, 100)).toEqual(100);
+            expect(snapInRange(1000, 2, undefined, 100)).toEqual(100);
         });
 
         it("should not enforce a maximum if no maxValue passed", function(){
-            expect(snap(21, 2, undefined, undefined)).toEqual(22);
+            expect(snapInRange(21, 2, undefined, undefined)).toEqual(22);
         });
 
         // Valid values are 55, 57, 59, 61, 63, 65
         it("should snap to a snap point based upon the minValue", function(){
-            expect(snap(56, 2, 55, 65)).toEqual(57);
+            expect(snapInRange(56, 2, 55, 65)).toEqual(57);
         });
 
         it("should enforce the minValue", function(){
-            expect(snap(20, 2, 55, 65)).toEqual(55);
+            expect(snapInRange(20, 2, 55, 65)).toEqual(55);
         });
 
         // Valid values are still 55, 57, 59, 61, 63, 65
         it("should snap to a snap point based upon the minValue even if maxValue is not on a snap point", function(){
-            expect(snap(100, 2, 55, 66)).toEqual(67);
+            expect(snapInRange(100, 2, 55, 66)).toEqual(67);
         });
 
-        it("should round to the nearest snap point", function(){
-            expect(snap(4, 5, 0, 100)).toEqual(5);
-        });
+        it("should round to the nearest snap point", function() {
+            expect(snapInRange(4, 5, 0, 100)).toEqual(5);
 
+            expect(snapInRange(10, 10, 1, 101)).toBe(11);
+            expect(snapInRange(11, 10, 1, 101)).toBe(11);
+            expect(snapInRange(12, 10, 1, 101)).toBe(11);
+            expect(snapInRange(20, 10, 1, 101)).toBe(21);
+            expect(snapInRange(21, 10, 1, 101)).toBe(21);
+            expect(snapInRange(22, 10, 1, 101)).toBe(21);
+        });
+        
+        it("should handle negative ranges", function() {
+            expect(snapInRange(-10, 10, -101, -1)).toBe(-11);
+            expect(snapInRange(-11, 10, -101, -1)).toBe(-11);
+            expect(snapInRange(-12, 10, -101, -1)).toBe(-11);
+            expect(snapInRange(-20, 10, -101, -1)).toBe(-21);
+            expect(snapInRange(-21, 10, -101, -1)).toBe(-21);
+            expect(snapInRange(-22, 10, -101, -1)).toBe(-21);
+        });
+    });
+    
+    describe("from", function() {
+        var from = Ext.Number.from;
+       
+        it("should handle numbers", function() {
+            expect(from(2, 1)).toBe(2);
+            expect(from(-2, 1)).toBe(-2);
+            expect(from(999999, 1)).toBe(999999);
+            expect(from(-999999, 1)).toBe(-999999);
+            expect(from(999999.999, 1)).toBe(999999.999);
+            expect(from(-999999.999, 1)).toBe(-999999.999);
+        });
+           
+        it("should handle strings that represent numbers", function() {
+            expect(from("2", 1)).toBe(2);
+            expect(from("-2", 1)).toBe(-2);
+            expect(from("999999", 1)).toBe(999999);
+            expect(from("-999999", 1)).toBe(-999999);
+            expect(from("999999.999", 1)).toBe(999999.999);
+            expect(from("-999999.999", 1)).toBe(-999999.999);
+        });
+           
+        it("should handle infinity", function() {
+            expect(from(1/0, 1)).toBe(window.Number.POSITIVE_INFINITY);
+            expect(from(-1/0, 1)).toBe(window.Number.NEGATIVE_INFINITY);
+        });
+           
+        it("should return default value if value is not a number or numeric string", function() {
+            expect(from("", 100)).toBe(100); 
+            expect(from(true, 100)).toBe(100); 
+            expect(from(false, 100)).toBe(100); 
+            expect(from("I would like to be a number", 100)).toBe(100); 
+            expect(from("12345ImAlmostANumber", 100)).toBe(100); 
+        });
+    });
+    
+    describe("randomInt", function() {
+        var randomInt = Ext.Number.randomInt;
+        it("should return a random integer within the specified range", function() {
+            expect(randomInt(0, 100)).not.toBeLessThan(0);
+            expect(randomInt(0, 100)).not.toBeGreaterThan(100);
+            expect(randomInt(-100, 0)).not.toBeLessThan(-100);
+            expect(randomInt(-100, 0)).not.toBeGreaterThan(0);
+            expect(randomInt(1, 1)).toBe(1);
+            expect(randomInt(1, 1)).toBe(1);
+        });
     });
 
 });

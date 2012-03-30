@@ -340,9 +340,19 @@ Ext.define('Ext.draw.Surface', {
 
     // @private
     initGradients: function() {
-        var gradients = this.gradients;
-        if (gradients) {
-            Ext.each(gradients, this.addGradient, this);
+        if (this.hasOwnProperty('gradients')) {
+            var gradients = this.gradients,
+                gLen      = gradients.length,
+                fn        = this.addGradient,
+                g;
+
+            if (gradients) {
+                for (g = 0; g < gLen; g++) {
+                    if (fn.call(this, gradients[g], g, gLen) === false) {
+                        break;
+                    }
+                }
+            }
         }
     },
 
@@ -534,13 +544,17 @@ Ext.define('Ext.draw.Surface', {
     add: function() {
         var args = Array.prototype.slice.call(arguments),
             sprite,
-            index;
-
-        var hasMultipleArgs = args.length > 1;
+            index,
+            hasMultipleArgs = args.length > 1,
+            items,
+            results,
+            i,
+            ln,
+            item;
+            
         if (hasMultipleArgs || Ext.isArray(args[0])) {
-            var items = hasMultipleArgs ? args : args[0],
-                results = [],
-                i, ln, item;
+            items = hasMultipleArgs ? args : args[0];
+            results = [];
 
             for (i = 0, ln = items.length; i < ln; i++) {
                 item = items[i];
@@ -635,9 +649,15 @@ Ext.define('Ext.draw.Surface', {
     remove: function(sprite, destroySprite) {
         if (sprite) {
             this.items.remove(sprite);
-            this.groups.each(function(item) {
-                item.remove(sprite);
-            });
+
+            var groups = [].concat(this.groups),
+                gLen   = groups.length,
+                g;
+
+            for (g = 0; g < gLen; g++) {
+                groups[g].remove(sprite);
+            }
+
             sprite.onRemove();
             if (destroySprite === true) {
                 sprite.destroy();
@@ -897,8 +917,9 @@ Ext.define('Ext.draw.Surface', {
      * @return {Object} The {@link Ext.draw.CompositeSprite}.
      */
     getGroup: function(id) {
+        var group;
         if (typeof id == "string") {
-            var group = this.groups.get(id);
+            group = this.groups.get(id);
             if (!group) {
                 group = this.createGroup(id);
             }

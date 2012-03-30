@@ -8,7 +8,7 @@
  *     @example
  *     Ext.create('Ext.panel.Panel', {
  *         width: 500,
- *         height: 400,
+ *         height: 300,
  *         title: 'Border Layout',
  *         layout: 'border',
  *         items: [{
@@ -39,6 +39,10 @@
  *     });
  *
  * # Notes
+ * 
+ *   - When using the split option, the layout will automatically insert a {@link Ext.resizer.Splitter}
+ *     into the appropriate place. This will modify the underlying
+ *     {@link Ext.container.Container#property-items items} collection in the container.
  *
  *   - Any Container using the Border layout **must** have a child item with `region:'center'`.
  *     The child item in the center region will always be resized to fill the remaining space
@@ -53,20 +57,6 @@
  *     `height`, or a {@link Ext.layout.container.Box#flex} value, or an initial percentage height
  *     **string** (Which is simply divided by 100 and used as a flex value).
  *     The 'center' region has a flex value of `1`.
- *
- *   - The regions of a BorderLayout are **fixed at render time** and thereafter, its child
- *     Components may not be removed or added**. To add/remove Components within a BorderLayout,
- *     have them wrapped by an additional Container which is directly managed by the BorderLayout.
- *     If the region is to be collapsible, the Container used directly by the BorderLayout manager
- *     should be a Panel. In the following example a Container (an Ext.panel.Panel) is added to
- *     the west region:
- *
- *         wrc = {@link Ext#getCmp Ext.getCmp}('west-region-container');
- *         wrc.{@link Ext.container.Container#removeAll removeAll}();
- *         wrc.{@link Ext.container.Container#method-add add}({
- *             title: 'Added Panel',
- *             html: 'Some content'
- *         });
  *
  *   - **There is no BorderLayout.Region class in ExtJS 4.0+**
  */
@@ -787,9 +777,8 @@ Ext.define('Ext.layout.container.Border', {
         addUnflexed: function (px) {
             this.flexSpace = Math.max(this.flexSpace - px, 0);
         }
-    };
-
-    var props = this.prototype.axisProps;
+    },
+    props = this.prototype.axisProps;
 
     Ext.apply(props.horz, methods);
     Ext.apply(props.vert, methods);

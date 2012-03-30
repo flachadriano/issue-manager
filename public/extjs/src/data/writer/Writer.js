@@ -94,26 +94,32 @@ Ext.define('Ext.data.writer.Writer', {
             writeAll = this.writeAllFields || isPhantom,
             nameProperty = this.nameProperty,
             fields = record.fields,
+            fieldItems = fields.items,
             data = {},
             changes,
             name,
             field,
-            key;
+            key,
+            f, fLen;
         
         if (writeAll) {
-            fields.each(function(field){
+            fLen = fieldItems.length;
+
+            for (f = 0; f < fLen; f++) {
+                field = fieldItems[f];
+
                 if (field.persist) {
-                    name = field[nameProperty] || field.name;
+                    name       = field[nameProperty] || field.name;
                     data[name] = record.get(field.name);
                 }
-            });
+            }
         } else {
             // Only write the changes
             changes = record.getChanges();
             for (key in changes) {
                 if (changes.hasOwnProperty(key)) {
-                    field = fields.get(key);
-                    name = field[nameProperty] || field.name;
+                    field      = fields.get(key);
+                    name       = field[nameProperty] || field.name;
                     data[name] = changes[key];
                 }
             }

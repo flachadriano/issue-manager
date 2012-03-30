@@ -105,8 +105,6 @@ Ext.Number = new function() {
                 tween *= 2;
                 if (tween >= increment) {
                     value += increment;
-                } else if (tween < -increment) {
-                    value -= increment;
                 }
             }
 
@@ -125,13 +123,11 @@ Ext.Number = new function() {
          * @param {Number} value The number to format
          * @param {Number} precision The number of digits to show after the decimal point
          */
-        toFixed: function(value, precision) {
-            if (isToFixedBroken) {
-                precision = precision || 0;
-                var pow = math.pow(10, precision);
-                return (math.round(value * pow) / pow).toFixed(precision);
-            }
-
+        toFixed: isToFixedBroken ? function(value, precision) {
+            precision = precision || 0;
+            var pow = math.pow(10, precision);
+            return (math.round(value * pow) / pow).toFixed(precision);
+        } : function(value, precision) {
             return value.toFixed(precision);
         },
 

@@ -91,13 +91,25 @@ var HIDDEN = 'hidden',
     EXTELMASKMSG    = Ext.baseCSSPrefix + "mask-msg",
     bodyRe          = /^body/i,
 
-//  speedy lookup for elements never to box adjust
+    // speedy lookup for elements never to box adjust
     noBoxAdjust = Ext.isStrict ? {
         select: 1
     }: {
         input: 1,
         select: 1,
         textarea: 1
+    },
+
+    // Pseudo for use by cacheScrollValues
+    isScrolled = function(c) {
+        var r = [], ri = -1,
+            i, ci;
+        for (i = 0; ci = c[i]; i++) {
+            if (ci.scrollTop > 0 || ci.scrollLeft > 0) {
+                r[++ri] = ci;
+            }
+        }
+        return r;
     },
 
     Element = Ext.define('Ext.dom.Element', {
@@ -117,22 +129,23 @@ var HIDDEN = 'hidden',
      */
     focus: function(defer, /* private */ dom) {
         var me = this,
-            scrollTop;
+            scrollTop,
+            body;
 
         dom = dom || me.dom;
+        body = (dom.ownerDocument || DOC).body || DOC.body;
         try {
             if (Number(defer)) {
-                Ext.defer(me.focus, defer, null, [null, dom]);
+                Ext.defer(me.focus, defer, me, [null, dom]);
             } else {
-                
                 // Focusing a large element, the browser attempts to scroll as much of it into view
                 // as possible. We need to override this behaviour.
                 if (dom.offsetHeight > Element.getViewHeight()) {
-                    scrollTop = DOC.body.scrollTop;
+                    scrollTop = body.scrollTop;
                 }
                 dom.focus();
                 if (scrollTop !== undefined) {
-                    DOC.body.scrollTop = scrollTop;
+                    body.scrollTop = scrollTop;
                 }
             }
         } catch(e) {
@@ -157,7 +170,11 @@ var HIDDEN = 'hidden',
      * @return {Boolean}
      */
     isBorderBox: function() {
-        return Ext.isBorderBox || noBoxAdjust[(this.dom.tagName || "").toLowerCase()];
+        var box = Ext.isBorderBox;
+        if (box) {
+            box = !((this.dom.tagName || "").toLowerCase() in noBoxAdjust);
+        }
+        return box;
     },
 
     /**
@@ -209,6 +226,46 @@ var HIDDEN = 'hidden',
             }
             return  d.getAttribute(name) || d[name] || null;
         },
+
+    /**
+     * When an element is moved around in the DOM, or is hidden using `display:none`, it loses layout, and therefore
+     * all scroll positions of all descendant elements are lost.
+     * 
+     * This function caches them, and returns a function, which when run will restore the cached positions.
+     * In the following example, the Panel is moved from one Container to another which will cause it to lose all scroll positions:
+     * 
+     *     var restoreScroll = myPanel.el.cacheScrollValues();
+     *     myOtherContainer.add(myPanel);
+     *     restoreScroll();
+     * 
+     * @return {Function} A function which will restore all descentant elements of this Element to their scroll
+     * positions recorded when this function was executed. Be aware that the returned function is a closure which has
+     * captured the scope of `cacheScrollValues`, so take care to derefence it as soon as not needed - if is it is a `var`
+     * it will drop out of scope, and the reference will be freed.
+     */
+    cacheScrollValues: function() {
+        var me = this,
+            scrolledDescendants,
+            el, i,
+            scrollValues = [],
+            result = function() {
+                for (i = 0; i < scrolledDescendants.length; i++) {
+                    el = scrolledDescendants[i];
+                    el.scrollLeft = scrollValues[i][0];
+                    el.scrollTop  = scrollValues[i][1];
+                }
+            };
+
+        if (!Ext.DomQuery.pseudos.isScrolled) {
+            Ext.DomQuery.pseudos.isScrolled = isScrolled;
+        }
+        scrolledDescendants = me.query(':isScrolled');
+        for (i = 0; i < scrolledDescendants.length; i++) {
+            el = scrolledDescendants[i];
+            scrollValues[i] = [el.scrollLeft, el.scrollTop];
+        }
+        return result;
+    },
 
     /**
      * @property {Boolean} autoBoxAdjust
@@ -898,7 +955,8 @@ var HIDDEN = 'hidden',
             var eid,
                 el,
                 d,
-                o;
+                o,
+                t;
 
             for (eid in EC) {
                 if (!EC.hasOwnProperty(eid)) {
@@ -939,7 +997,7 @@ var HIDDEN = 'hidden',
             }
             // Cleanup IE Object leaks
             if (Ext.isIE) {
-                var t = {};
+                t = {};
                 for (eid in EC) {
                     if (!EC.hasOwnProperty(eid)) {
                         continue;
@@ -997,7 +1055,8 @@ var HIDDEN = 'hidden',
          * @return {Ext.dom.Element} this
          */
         swallowEvent : function(eventName, preventDefault) {
-            var me = this;
+            var me = this,
+                e, eLen;
             function fn(e) {
                 e.stopPropagation();
                 if (preventDefault) {
@@ -1006,9 +1065,12 @@ var HIDDEN = 'hidden',
             }
 
             if (Ext.isArray(eventName)) {
-                Ext.each(eventName, function(e) {
-                     me.on(e, fn);
-                });
+                eLen = eventName.length;
+
+                for (e = 0; e < eLen; e++) {
+                    me.on(eventName[e], fn);
+                }
+
                 return me;
             }
             me.on(eventName, fn);
@@ -1127,18 +1189,19 @@ var HIDDEN = 'hidden',
             html += '<span id="' + id + '"></span>';
 
             interval = setInterval(function() {
-                if (!(el = DOC.getElementById(id))) {
-                    return false;
-                }
-                clearInterval(interval);
-                Ext.removeNode(el);
-                var hd     = Ext.getHead().dom,
+                var hd,
                     match,
                     attrs,
                     srcMatch,
                     typeMatch,
                     el,
                     s;
+                if (!(el = DOC.getElementById(id))) {
+                    return false;
+                }
+                clearInterval(interval);
+                Ext.removeNode(el);
+                hd = Ext.getHead().dom;
 
                 while ((match = scriptTagRe.exec(html))) {
                     attrs = match[1];
@@ -1321,4 +1384,4 @@ var HIDDEN = 'hidden',
     }
 });
 
-})();
+}());

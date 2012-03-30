@@ -187,6 +187,8 @@ Ext.define('Ext.chart.series.Bar', {
         var me = this,
             chart = me.chart,
             store = chart.getChartStore(),
+            data = store.data.items,
+            i, ln, record,
             bars = [].concat(me.yField),
             barsLen = bars.length,
             groupBarsLen = barsLen,
@@ -245,7 +247,8 @@ Ext.define('Ext.chart.series.Bar', {
 
         if (stacked) {
             total = [[], []];
-            store.each(function(record, i) {
+            for (i = 0, ln = data.length; i < ln; i++) {
+                record = data[i];
                 total[0][i] = total[0][i] || 0;
                 total[1][i] = total[1][i] || 0;
                 for (j = 0; j < barsLen; j++) {
@@ -255,7 +258,7 @@ Ext.define('Ext.chart.series.Bar', {
                     rec = record.get(bars[j]);
                     total[+(rec > 0)][i] += mabs(rec);
                 }
-            });
+            }
             total[+(maxY > 0)].push(mabs(maxY));
             total[+(minY > 0)].push(mabs(minY));
             minus = mmax.apply(math, total[0]);
@@ -288,6 +291,8 @@ Ext.define('Ext.chart.series.Bar', {
         var me = this,
             chart = me.chart,
             store = chart.getChartStore(),
+            data = store.data.items,
+            i, total, record,
             bounds = me.bounds = me.getBounds(),
             items = me.items = [],
             yFields = me.yField,
@@ -314,7 +319,8 @@ Ext.define('Ext.chart.series.Bar', {
             j, yValue, height, totalDim, totalNegDim, bottom, top, hasShadow, barAttr, attrs, counter,
             shadowIndex, shadow, sprite, offset, floorY;
 
-        store.each(function(record, i, total) {
+        for (i = 0, total = data.length; i < total; i++) {
+            record = data[i];
             bottom = bounds.zero;
             top = bounds.zero;
             totalDim = 0;
@@ -420,7 +426,7 @@ Ext.define('Ext.chart.series.Bar', {
                 items[i * counter].totalDim = totalDim;
                 items[i * counter].totalNegDim = totalNegDim;
             }
-        }, me);
+        }
     },
 
     // @private render/setAttributes on the shadows
@@ -763,30 +769,44 @@ Ext.define('Ext.chart.series.Bar', {
 
     // @private hide all markers
     hideAll: function(index) {
-        var axes = this.chart.axes;
+        var axes      = this.chart.axes,
+            axesItems = axes.items,
+            ln        = axesItems.length,
+            i         = 0;
+
         index = (isNaN(this._index) ? index : this._index) || 0;
+
         if (!this.__excludes) {
             this.__excludes = [];
         }
+
         this.__excludes[index] = true;
         this.drawSeries();
-        axes.each(function(axis) {
-            axis.drawAxis();
-        });
+
+        for (i; i < ln; i++) {
+            axesItems[i].drawAxis();
+        }    
     },
 
     // @private show all markers
     showAll: function(index) {
-        var axes = this.chart.axes;
+        var axes = this.chart.axes,
+            axesItems = axes.items,
+            ln        = axesItems.length,
+            i         = 0;
+
         index = (isNaN(this._index) ? index : this._index) || 0;
+
         if (!this.__excludes) {
             this.__excludes = [];
         }
+
         this.__excludes[index] = false;
         this.drawSeries();
-        axes.each(function(axis) {
-            axis.drawAxis();
-        });
+
+        for (i; i < ln; i++) {
+            axesItems[i].drawAxis();
+        }    
     },
 
     /**

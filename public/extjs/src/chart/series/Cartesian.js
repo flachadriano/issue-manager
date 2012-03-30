@@ -43,22 +43,29 @@ Ext.define('Ext.chart.series.Cartesian', {
     getLegendLabels: function() {
         var me = this,
             labels = [],
-            combinations = me.combinations;
+            fields, i, ln,
+            combinations = me.combinations,
+            title,
+            combo, label0, label1;
 
-        Ext.each([].concat(me.yField), function(yField, i) {
-            var title = me.title;
+        fields = [].concat(me.yField);
+        for (i = 0, ln = fields.length; i < ln; i++) {
+            title = me.title;
             // Use the 'title' config if present, otherwise use the raw yField name
-            labels.push((Ext.isArray(title) ? title[i] : title) || yField);
-        });
+            labels.push((Ext.isArray(title) ? title[i] : title) || fields[i]);
+        }
 
         // Handle yFields combined via legend drag-drop
+        // TODO need to check to see if this is supported in extjs 4 branch
         if (combinations) {
-            Ext.each(combinations, function(combo) {
-                var label0 = labels[combo[0]],
-                    label1 = labels[combo[1]];
+            combinations = Ext.Array.from(combinations);
+            for (i = 0, ln = combinations.length; i < ln; i++) {
+                combo = combinations[i];
+                label0 = labels[combo[0]];
+                label1 = labels[combo[1]];
                 labels[combo[1]] = label0 + ' & ' + label1;
                 labels.splice(combo[0], 1);
-            });
+            }
         }
 
         return labels;
@@ -73,9 +80,14 @@ Ext.define('Ext.chart.series.Cartesian', {
      * @param {Object} scope
      */
     eachYValue: function(record, fn, scope) {
-        Ext.each(this.getYValueAccessors(), function(accessor, i) {
+        var me = this,
+            yValueAccessors = me.getYValueAccessors(),
+            i, ln, accessor;
+        
+        for (i = 0, ln = yValueAccessors.length; i < ln; i++) {
+            accessor = yValueAccessors[i];
             fn.call(scope, accessor(record), i);
-        });
+        }
     },
 
     /**
@@ -117,14 +129,18 @@ Ext.define('Ext.chart.series.Cartesian', {
      */
     getYValueAccessors: function() {
         var me = this,
-            accessors = me.yValueAccessors;
+            accessors = me.yValueAccessors,
+            yFields, yField, i, ln;
         if (!accessors) {
             accessors = me.yValueAccessors = [];
-            Ext.each([].concat(me.yField), function(yField) {
+            yFields = [].concat(me.yField);
+            
+            for (i = 0, ln = yFields.length; i < ln; i++) {
+                yField = yFields[i];
                 accessors.push(function(record) {
                     return record.get(yField);
                 });
-            });
+            }
         }
         return accessors;
     },
@@ -135,21 +151,28 @@ Ext.define('Ext.chart.series.Cartesian', {
      */
     getMinMaxXValues: function() {
         var me = this,
+            chart = me.chart,
+            store = chart.getChartStore(),
+            data = store.data.items,
+            i, ln, record,
             min, max,
-            xField = me.xField;
+            xField = me.xField,
+            xValue;
 
         if (me.getRecordCount() > 0) {
             min = Infinity;
             max = -min;
-            me.eachRecord(function(record) {
-                var xValue = record.get(xField);
+                
+            for (i = 0, ln = data.length; i < ln; i++) {
+                record = data[i];
+                xValue = record.get(xField);
                 if (xValue > max) {
                     max = xValue;
                 }
                 if (xValue < min) {
                     min = xValue;
                 }
-            });
+            }
         } else {
             min = max = 0;
         }
@@ -163,6 +186,10 @@ Ext.define('Ext.chart.series.Cartesian', {
      */
     getMinMaxYValues: function() {
         var me = this,
+            chart = me.chart,
+            store = chart.getChartStore(),
+            data = store.data.items,
+            i, ln, record,
             stacked = me.stacked,
             min, max,
             positiveTotal, negativeTotal;
@@ -191,7 +218,9 @@ Ext.define('Ext.chart.series.Cartesian', {
         if (me.getRecordCount() > 0) {
             min = Infinity;
             max = -min;
-            me.eachRecord(function(record) {
+            
+            for (i = 0, ln = data.length; i < ln; i++) {
+                record = data[i];
                 if (stacked) {
                     positiveTotal = 0;
                     negativeTotal = 0;
@@ -205,7 +234,7 @@ Ext.define('Ext.chart.series.Cartesian', {
                 } else {
                     me.eachYValue(record, eachYValue);
                 }
-            });
+            }
         } else {
             min = max = 0;
         }

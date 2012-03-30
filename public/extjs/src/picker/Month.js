@@ -297,18 +297,25 @@ Ext.define('Ext.picker.Month', {
             value = me.getYear(null),
             month = me.value[0],
             monthOffset = me.monthOffset,
-            year;
+            year,
+            yearItems, y, yLen, el;
 
         if (me.rendered) {
             years.removeCls(cls);
             months.removeCls(cls);
-            years.each(function(el, all, index){
-                year = yearNumbers[index];
+
+            yearItems = years.elements;
+            yLen      = yearItems.length;
+
+            for (y = 0; y < yLen; y++) {
+                el = Ext.fly(yearItems[y]);
+
+                year = yearNumbers[y];
                 el.dom.innerHTML = year;
                 if (year == value) {
                     el.dom.className = cls;
                 }
-            });
+            }
             if (month !== null) {
                 if (month < monthOffset) {
                     month = month * 2;

@@ -159,36 +159,58 @@ Ext.define('Ext.grid.column.Action', {
     constructor: function(config) {
         var me = this,
             cfg = Ext.apply({}, config),
-            items = cfg.items || [me],
-            l = items.length,
-            i,
-            item;
+            items = cfg.items || [me];
 
+
+        me.origRenderer = cfg.renderer || me.renderer;
+        me.origScope = cfg.scope || me.scope;
+        
+        delete me.renderer;
+        delete me.scope;
+        delete cfg.renderer;
+        delete cfg.scope;
+        
         // This is a Container. Delete the items config to be reinstated after construction.
         delete cfg.items;
         me.callParent([cfg]);
 
         // Items is an array property of ActionColumns
         me.items = items;
+        
+        if (me.origRenderer) {
+            me.hasCustomRenderer = true;
+        }
+    },
+    
+    // Renderer closure iterates through items creating an <img> element for each and tagging with an identifying
+    // class name x-action-col-{n}
+    defaultRenderer: function(v, meta){
+        var me = this,
+            prefix = Ext.baseCSSPrefix,
+            scope = me.origScope || me,
+            items = me.items,
+            len = items.length,
+            i = 0,
+            item;
+            
+        // Allow a configured renderer to create initial value (And set the other values in the "metadata" argument!)
+        v = Ext.isFunction(me.origRenderer) ? me.origRenderer.apply(scope, arguments) || '' : '';
 
-//      Renderer closure iterates through items creating an <img> element for each and tagging with an identifying
-//      class name x-action-col-{n}
-        me.renderer = function(v, meta) {
-//          Allow a configured renderer to create initial value (And set the other values in the "metadata" argument!)
-            v = Ext.isFunction(cfg.renderer) ? cfg.renderer.apply(this, arguments)||'' : '';
-
-            meta.tdCls += ' ' + Ext.baseCSSPrefix + 'action-col-cell';
-            for (i = 0; i < l; i++) {
-                item = items[i];
+        meta.tdCls += ' ' + Ext.baseCSSPrefix + 'action-col-cell';
+        for (; i < len; i++) {
+            item = items[i];
+            if (!item.hasActionConfiguration) {
                 item.disable = Ext.Function.bind(me.disableAction, me, [i], 0);
                 item.enable = Ext.Function.bind(me.enableAction, me, [i], 0);
-                v += '<img alt="' + (item.altText || me.altText) + '" src="' + (item.icon || Ext.BLANK_IMAGE_URL) +
-                    '" class="' + Ext.baseCSSPrefix + 'action-col-icon ' + Ext.baseCSSPrefix + 'action-col-' + String(i) + ' ' + (item.disabled ? Ext.baseCSSPrefix + 'item-disabled' : ' ') +
-                    ' ' + (Ext.isFunction(item.getClass) ? item.getClass.apply(item.scope||me.scope||me, arguments) : (item.iconCls || me.iconCls || '')) + '"' +
-                    ((item.tooltip) ? ' data-qtip="' + item.tooltip + '"' : '') + ' />';
+                item.hasActionConfiguration = true;
             }
-            return v;
-        };
+            
+            v += '<img alt="' + (item.altText || me.altText) + '" src="' + (item.icon || Ext.BLANK_IMAGE_URL) +
+                '" class="' + prefix + 'action-col-icon ' + prefix + 'action-col-' + String(i) + ' ' + (item.disabled ? prefix + 'item-disabled' : ' ') +
+                ' ' + (Ext.isFunction(item.getClass) ? item.getClass.apply(item.scope || scope, arguments) : (item.iconCls || me.iconCls || '')) + '"' +
+                ((item.tooltip) ? ' data-qtip="' + item.tooltip + '"' : '') + ' />';
+        }
+        return v;    
     },
 
     /**

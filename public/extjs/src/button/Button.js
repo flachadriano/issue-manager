@@ -147,7 +147,7 @@ Ext.define('Ext.button.Button', {
 
     /*
      * @property {Boolean} isAction
-     * `true` in this class to identify an objact as an instantiated Button, or subclass thereof.
+     * `true` in this class to identify an object as an instantiated Button, or subclass thereof.
      */
     isButton: true,
     componentLayout: 'button',
@@ -361,6 +361,8 @@ Ext.define('Ext.button.Button', {
       * property is specified.
       */
      hrefTarget: '_blank',
+     
+     border: true,
 
     /**
      * @cfg {Object} baseParams
@@ -382,8 +384,8 @@ Ext.define('Ext.button.Button', {
             '<tpl if="href">',
                 '<a id="{id}-btnEl" href="{href}" class="{btnCls}" target="{hrefTarget}"',
                     '<tpl if="tabIndex"> tabIndex="{tabIndex}"</tpl>',
-                    ' role="link">',
                     '<tpl if="disabled"> disabled="disabled"</tpl>',
+                    ' role="link">',
                     '<span id="{id}-btnInnerEl" class="{baseCls}-inner">',
                         '{text}',
                     '</span>',
@@ -476,13 +478,6 @@ Ext.define('Ext.button.Button', {
      * option.
      */
 
-    /**
-     * @cfg {Boolean} autoWidth
-     * By default, if a width is not specified the button will attempt to stretch horizontally to fit its content. If
-     * the button is being managed by a width sizing layout (hbox, fit, anchor), set this to false to prevent the button
-     * from doing this automatic sizing.
-     */
-
     maskOnDisable: false,
     
     /**
@@ -494,6 +489,8 @@ Ext.define('Ext.button.Button', {
     persistentPadding: undefined,
 
     shrinkWrap: 3,
+
+    frame: true,
 
     // inherit docs
     initComponent: function() {

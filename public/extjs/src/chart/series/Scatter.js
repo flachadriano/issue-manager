@@ -203,6 +203,8 @@ Ext.define('Ext.chart.series.Scatter', {
             chart = me.chart,
             enableShadows = chart.shadow,
             store = chart.getChartStore(),
+            data = store.data.items,
+            i, ln, record,
             group = me.group,
             bounds = me.bounds = me.getBounds(),
             bbox = me.bbox,
@@ -217,7 +219,8 @@ Ext.define('Ext.chart.series.Scatter', {
             attrs = [],
             x, y, xValue, yValue, sprite;
 
-        store.each(function(record, i) {
+        for (i = 0, ln = data.length; i < ln; i++) {
+            record = data[i];
             xValue = record.get(me.xField);
             yValue = record.get(me.yField);
             //skip undefined or null values
@@ -228,7 +231,7 @@ Ext.define('Ext.chart.series.Scatter', {
                     Ext.global.console.warn("[Ext.chart.series.Scatter]  Skipping a store element with a value which is either undefined or null  at ", record, xValue, yValue);
                 }
                 //</debug>
-                return;
+                continue;
             }
             // Ensure a value
             if (typeof xValue == 'string' || typeof xValue == 'object' && !Ext.isDate(xValue)) {
@@ -261,7 +264,7 @@ Ext.define('Ext.chart.series.Scatter', {
                     }
                 }
             }
-        });
+        }
         return attrs;
     },
 

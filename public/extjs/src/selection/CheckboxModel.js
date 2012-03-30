@@ -56,14 +56,16 @@ Ext.define('Ext.selection.CheckboxModel', {
     },
 
     hasLockedHeader: function(){
-        var hasLocked = false;
-        Ext.each(this.views, function(view){
-            if (view.headerCt.lockedCt) {
-                hasLocked = true;
-                return false;
+        var views     = this.views,
+            vLen      = views.length,
+            v;
+
+        for (v = 0; v < vLen; v++) {
+            if (views[v].headerCt.lockedCt) {
+                return true;
             }
-        });
-        return hasLocked;
+        }
+        return false;
     },
 
     /**
@@ -188,7 +190,8 @@ Ext.define('Ext.selection.CheckboxModel', {
     onRowMouseDown: function(view, record, item, index, e) {
         view.el.focus();
         var me = this,
-            checker = e.getTarget('.' + Ext.baseCSSPrefix + 'grid-row-checker');
+            checker = e.getTarget('.' + Ext.baseCSSPrefix + 'grid-row-checker'),
+            mode;
             
         if (!me.allowRightMouseSelection(e)) {
             return;
@@ -200,7 +203,7 @@ Ext.define('Ext.selection.CheckboxModel', {
         }
 
         if (checker) {
-            var mode = me.getSelectionMode();
+            mode = me.getSelectionMode();
             // dont change the mode if its single otherwise
             // we would get multiple selection
             if (mode !== 'SINGLE') {

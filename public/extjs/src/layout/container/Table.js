@@ -240,9 +240,16 @@ Ext.define('Ext.layout.container.Table', {
     finalizeLayout: function() {
         if (this.needsDivWrap()) {
             // set wrapper div width to match layed out item - see docs below
-            Ext.Array.forEach(this.getLayoutItems(), function(item) {
+            var items = this.getLayoutItems(),
+                i,
+                iLen  = items.length,
+                item;
+
+            for (i = 0; i < iLen; i++) {
+                item = items[i];
+
                 Ext.fly(item.el.dom.parentNode).setWidth(item.getWidth());
-            });
+            }
         }
         if (Ext.isIE6 || (Ext.isIEQuirks)) {
             // Fixes an issue where the table won't paint

@@ -7,7 +7,7 @@ Ext.define('Ext.panel.Header', {
     alias: 'widget.header',
 
     /**
-     * @property {Boolean} isAction
+     * @property {Boolean} isHeader
      * `true` in this class to identify an objact as an instantiated Header, or subclass thereof.
      */
     isHeader       : true,
@@ -16,15 +16,21 @@ Ext.define('Ext.panel.Header', {
     weight         : -1,
     componentLayout: 'body',
 
+    /**
+     * @cfg {String} [titleAlign='left']
+     * May be `"left"`, `"right"` or `"center"`.
+     *
+     * The alignment of the title text within the available space between the icon and the tools.
+     */
+    titleAlign: 'left',
+
     childEls: [
         'body'
     ],
 
     renderTpl: [
-        '<div id="{id}-body" class="{baseCls}-body<tpl if="bodyCls"> {bodyCls}</tpl>',
-        '<tpl if="uiCls">',
-            '<tpl for="uiCls"> {parent.baseCls}-body-{parent.ui}-{.}</tpl>',
-        '</tpl>"',
+        '<div id="{id}-body" class="{baseCls}-body {bodyCls}',
+        '<tpl for="uiCls"> {parent.baseCls}-body-{parent.ui}-{.}"</tpl>',
         '<tpl if="bodyStyle"> style="{bodyStyle}"</tpl>>',
             '{%this.renderContainer(out,values)%}',
         '</div>'
@@ -150,6 +156,7 @@ Ext.define('Ext.panel.Header', {
                 noWrap    : true,
                 flex      : 1,
                 id        : me.id + '_hd',
+                style     : 'text-align:' + me.titleAlign,
                 cls       : me.baseCls + '-text-container',
                 renderTpl : me.getTpl('headingTpl'),
                 renderData: {
@@ -197,74 +204,58 @@ Ext.define('Ext.panel.Header', {
     },
 
     // inherit docs
-    addUIClsToElement: function(cls, force) {
+    addUIClsToElement: function(cls) {
         var me = this,
             result = me.callParent(arguments),
             classes = [me.baseCls + '-body-' + cls, me.baseCls + '-body-' + me.ui + '-' + cls],
             array, i;
 
-        if (!force && me.rendered) {
-            if (me.bodyCls) {
-                me.body.addCls(me.bodyCls);
-            } else {
-                me.body.addCls(classes);
-            }
-        } else {
-            if (me.bodyCls) {
-                array = me.bodyCls.split(' ');
+        if (me.bodyCls) {
+            array = me.bodyCls.split(' ');
 
-                for (i = 0; i < classes.length; i++) {
-                    if (!Ext.Array.contains(array, classes[i])) {
-                        array.push(classes[i]);
-                    }
+            for (i = 0; i < classes.length; i++) {
+                if (!Ext.Array.contains(array, classes[i])) {
+                    array.push(classes[i]);
                 }
-
-                me.bodyCls = array.join(' ');
-            } else {
-                me.bodyCls = classes.join(' ');
             }
+
+            me.bodyCls = array.join(' ');
+        } else {
+            me.bodyCls = classes.join(' ');
         }
 
         return result;
     },
 
     // inherit docs
-    removeUIClsFromElement: function(cls, force) {
+    removeUIClsFromElement: function(cls) {
         var me = this,
             result = me.callParent(arguments),
             classes = [me.baseCls + '-body-' + cls, me.baseCls + '-body-' + me.ui + '-' + cls],
             array, i;
 
-        if (!force && me.rendered) {
-            if (me.bodyCls) {
-                me.body.removeCls(me.bodyCls);
-            } else {
-                me.body.removeCls(classes);
-            }
-        } else {
-            if (me.bodyCls) {
-                array = me.bodyCls.split(' ');
+        if (me.bodyCls) {
+            array = me.bodyCls.split(' ');
 
-                for (i = 0; i < classes.length; i++) {
-                    Ext.Array.remove(array, classes[i]);
-                }
-
-                me.bodyCls = array.join(' ');
+            for (i = 0; i < classes.length; i++) {
+                Ext.Array.remove(array, classes[i]);
             }
+
+            me.bodyCls = array.join(' ');
         }
 
-       return result;
+        return result;
     },
 
     // inherit docs
-    addUIToElement: function(force) {
+    addUIToElement: function() {
         var me = this,
             array, cls;
 
         me.callParent(arguments);
 
         cls = me.baseCls + '-body-' + me.ui;
-        if (!force && me.rendered) {
+        if (me.rendered) {
             if (me.bodyCls) {
                 me.body.addCls(me.bodyCls);
             } else {
@@ -284,7 +275,7 @@ Ext.define('Ext.panel.Header', {
             }
         }
 
-        if (!force && me.titleCmp && me.titleCmp.rendered && me.titleCmp.textEl) {
+        if (me.titleCmp && me.titleCmp.rendered && me.titleCmp.textEl) {
             me.titleCmp.textEl.addCls(me.baseCls + '-text-' + me.ui);
         }
     },
@@ -361,6 +352,7 @@ Ext.define('Ext.panel.Header', {
                     me.title = title;
                     me.titleCmp.textEl.update(me.title || '&#160;');
                 }
+                me.titleCmp.updateLayout();
             } else {
                 me.titleCmp.on({
                     render: function() {
@@ -469,7 +461,7 @@ Ext.define('Ext.panel.Header', {
     },
 
     /**
-     * @private
+     * @protected
      * Set up the `tools.<tool type>` link in the owning Panel.
      * Bind the tool to its owning Panel.
      * @param component

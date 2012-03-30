@@ -129,7 +129,7 @@ Ext.define('Ext.form.FieldSet', {
      * The {@link Ext.container.Container#layout} for the fieldset's immediate child items.
      */
     layout: 'anchor',
-    
+
     border: 1,
 
     componentLayout: 'fieldset',
@@ -146,6 +146,8 @@ Ext.define('Ext.form.FieldSet', {
             '{%this.renderContainer(out,values);%}',
         '</div>'
     ],
+
+    stateEvents : [ 'collapse', 'expand' ],
 
     maskOnDisable: false,
 
@@ -288,7 +290,7 @@ Ext.define('Ext.form.FieldSet', {
                     click : me.toggle
                 }
             };
-            cfg.cls += ' ' + me.baseCls + '-header-text-collapsible'
+            cfg.cls += ' ' + me.baseCls + '-header-text-collapsible';
         }
 
         return (me.titleCmp = Ext.widget(cfg));
@@ -309,7 +311,7 @@ Ext.define('Ext.form.FieldSet', {
     createCheckboxCmp: function() {
         var me = this,
             suffix = '-checkbox';
-            
+
         me.checkboxCmp = Ext.widget({
             xtype: 'checkbox',
             hideEmptyLabel: true,
@@ -386,7 +388,7 @@ Ext.define('Ext.form.FieldSet', {
 
         return legend ? [ legend ] : [];
     },
-    
+
     /**
      * Sets the title of this fieldset
      * @param {String} title The new title

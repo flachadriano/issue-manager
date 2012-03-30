@@ -81,35 +81,35 @@ Ext.apply(Ext, {
      * Returns the current document body as an {@link Ext.Element}.
      * @return Ext.Element The document body
      */
-    getBody: function() {
+    getBody: (function() {
         var body;
         return function() {
             return body || (body = Ext.get(document.body));
         };
-    }(),
+    }()),
 
     /**
      * Returns the current document head as an {@link Ext.Element}.
      * @return Ext.Element The document head
      * @method
      */
-    getHead: function() {
+    getHead: (function() {
         var head;
         return function() {
             return head || (head = Ext.get(document.getElementsByTagName("head")[0]));
         };
-    }(),
+    }()),
 
     /**
      * Returns the current HTML document object as an {@link Ext.Element}.
      * @return Ext.Element The document
      */
-    getDoc: function() {
+    getDoc: (function() {
         var doc;
         return function() {
             return doc || (doc = Ext.get(document));
         };
-    }(),
+    }()),
 
     /**
      * This is shorthand reference to {@link Ext.ComponentManager#get}.
@@ -264,6 +264,7 @@ Opera 11.11 - Opera/9.80 (Windows NT 6.1; U; en) Presto/2.8.131 Version/11.11
         isGecko3 = isGecko && check(/rv:1\.9/),
         isGecko4 = isGecko && check(/rv:2\.0/),
         isGecko5 = isGecko && check(/rv:5\./),
+        isGecko10 = isGecko && check(/rv:10\./),
         isFF3_0 = isGecko3 && check(/rv:1\.9\.0/),
         isFF3_5 = isGecko3 && check(/rv:1\.9\.1/),
         isFF3_6 = isGecko3 && check(/rv:1\.9\.2/),
@@ -277,7 +278,8 @@ Opera 11.11 - Opera/9.80 (Windows NT 6.1; U; en) Presto/2.8.131 Version/11.11
         operaVersion = version(isOpera, /version\/(\d+\.\d+)/),
         safariVersion = version(isSafari, /version\/(\d+\.\d+)/),
         webKitVersion = version(isWebKit, /webkit\/(\d+\.\d+)/),
-        isSecure = /^https/i.test(window.location.protocol);
+        isSecure = /^https/i.test(window.location.protocol),
+        nullLog;
 
     // remove css image flicker
     try {
@@ -288,30 +290,34 @@ Opera 11.11 - Opera/9.80 (Windows NT 6.1; U; en) Presto/2.8.131 Version/11.11
     //<debug>
     var primitiveRe = /string|number|boolean/;
     function dumpObject (object) {
-        var member, type,
+        var member, type, value, name,
             members = [];
 
         // Cannot use Ext.encode since it can recurse endlessly (if we're lucky)
         // ...and the data could be prettier!
-        Ext.Object.each(object, function (name, value) {
-            type = typeof value;
-            if (type == "function") {
-                return;
-            }
+        for (name in object) {
+            if (object.hasOwnProperty(name)) {
+                value = object[name];
 
-            if (type == 'undefined') {
-                member = type;
-            } else if (value === null || primitiveRe.test(type) || Ext.isDate(value)) {
-                member = Ext.encode(value);
-            } else if (Ext.isArray(value)) {
-                member = '[ ]';
-            } else if (Ext.isObject(value)) {
-                member = '{ }';
-            } else {
-                member = type;
+                type = typeof value;
+                if (type == "function") {
+                    continue;
+                }
+
+                if (type == 'undefined') {
+                    member = type;
+                } else if (value === null || primitiveRe.test(type) || Ext.isDate(value)) {
+                    member = Ext.encode(value);
+                } else if (Ext.isArray(value)) {
+                    member = '[ ]';
+                } else if (Ext.isObject(value)) {
+                    member = '{ }';
+                } else {
+                    member = type;
+                }
+                members.push(Ext.encode(name) + ': ' + member);
             }
-            members.push(Ext.encode(name) + ': ' + member);
-        });
+        }
 
         if (members.length) {
             return ' \nData: {\n  ' + members.join(',\n  ') + '\n}';
@@ -324,7 +330,9 @@ Opera 11.11 - Opera/9.80 (Windows NT 6.1; U; en) Presto/2.8.131 Version/11.11
             con = Ext.global.console,
             level = 'log',
             indent = log.indent || 0,
-            stack;
+            stack,
+            out,
+            max;
 
         log.indent = indent;
 
@@ -381,8 +389,8 @@ Opera 11.11 - Opera/9.80 (Windows NT 6.1; U; en) Presto/2.8.131 Version/11.11
             if (Ext.isOpera) {
                 opera.postError(message);
             } else {
-                var out = log.out,
-                    max = log.max;
+                out = log.out;
+                max = log.max;
 
                 if (out.length >= max) {
                     // this formula allows out.max to change (via debugger), where the
@@ -409,13 +417,13 @@ Opera 11.11 - Opera/9.80 (Windows NT 6.1; U; en) Presto/2.8.131 Version/11.11
 
     log.error = function () {
         logx('error', Array.prototype.slice.call(arguments));
-    }
+    };
     log.info = function () {
         logx('info', Array.prototype.slice.call(arguments));
-    }
+    };
     log.warn = function () {
         logx('warn', Array.prototype.slice.call(arguments));
-    }
+    };
 
     log.count = 0;
     log.counters = { error: 0, warn: 0, info: 0, log: 0 };
@@ -441,7 +449,7 @@ Opera 11.11 - Opera/9.80 (Windows NT 6.1; U; en) Presto/2.8.131 Version/11.11
     };
     //</debug>
 
-    var nullLog = function () {};
+    nullLog = function () {};
     nullLog.info = nullLog.warn = nullLog.error = Ext.emptyFn;
 
     Ext.setVersion('extjs', '4.1.0');
@@ -554,18 +562,21 @@ Opera 11.11 - Opera/9.80 (Windows NT 6.1; U; en) Presto/2.8.131 Version/11.11
          * @param {HTMLElement} node The node to remove
          * @method
          */
-        removeNode : isIE6 || isIE7 ? function() {
+        removeNode : isIE6 || isIE7 || isIE8 ? (function() {
             var d;
             return function(n){
                 if(n && n.tagName != 'BODY'){
                     (Ext.enableNestedListenerRemoval) ? Ext.EventManager.purgeElement(n) : Ext.EventManager.removeAll(n);
+                    if (isIE8 && n.parentNode) {
+                        n.parentNode.removeChild(n);
+                    }
                     d = d || document.createElement('div');
                     d.appendChild(n);
                     d.innerHTML = '';
                     delete Ext.cache[n.id];
                 }
             };
-        }() : function(n) {
+        }()) : function(n) {
             if (n && n.parentNode && n.tagName != 'BODY') {
                 (Ext.enableNestedListenerRemoval) ? Ext.EventManager.purgeElement(n) : Ext.EventManager.removeAll(n);
                 n.parentNode.removeChild(n);
@@ -686,6 +697,12 @@ Opera 11.11 - Opera/9.80 (Windows NT 6.1; U; en) Presto/2.8.131 Version/11.11
         isGecko5 : isGecko5,
 
         /**
+         * True if the detected browser uses a Gecko 5.0+ layout engine (e.g. Firefox 5.x).
+         * @type Boolean
+         */
+        isGecko10 : isGecko10,
+
+        /**
          * True if the detected browser uses FireFox 3.0
          * @type Boolean
          */
@@ -714,6 +731,12 @@ Opera 11.11 - Opera/9.80 (Windows NT 6.1; U; en) Presto/2.8.131 Version/11.11
          * @type Boolean
          */
         isFF5 : 5 <= firefoxVersion && firefoxVersion < 6,
+
+        /**
+         * True if the detected browser uses FireFox 10
+         * @type Boolean
+         */
+        isFF10 : 10 <= firefoxVersion && firefoxVersion < 11,
 
         /**
          * True if the detected platform is Linux.
@@ -816,7 +839,7 @@ Opera 11.11 - Opera/9.80 (Windows NT 6.1; U; en) Presto/2.8.131 Version/11.11
          * @deprecated 4.0.0 Use {@link Ext.String#escapeRegex} instead
          */
         escapeRe : function(s) {
-            return s.replace(/([-.*+?^${}()|[\]\/\\])/g, "\\$1");
+            return s.replace(/([-.*+?\^${}()|\[\]\/\\])/g, "\\$1");
         },
 
         /**
@@ -828,7 +851,7 @@ Opera 11.11 - Opera/9.80 (Windows NT 6.1; U; en) Presto/2.8.131 Version/11.11
          *         '#foo a@click' : function(e, t){
          *             // do something
          *         },
-         *      
+         *
          *         // add the same listener to multiple selectors (separated by comma BEFORE the @)
          *         '#foo a, #bar span.some-class@mouseover' : function(){
          *             // do something
@@ -937,11 +960,19 @@ Opera 11.11 - Opera/9.80 (Windows NT 6.1; U; en) Presto/2.8.131 Version/11.11
             if(typeof names == 'string'){
                 names = names.split(/[,;\s]/);
             }
-            Ext.each(names, function(name){
+
+            var n,
+                nLen = names.length,
+                name;
+
+            for(n = 0; n < nLen; n++) {
+                name = names[n];
+
                 if(usePrototypeKeys || source.hasOwnProperty(name)){
                     dest[name] = source[name];
                 }
-            }, this);
+            }
+
             return dest;
         },
 
@@ -1025,10 +1056,15 @@ Opera 11.11 - Opera/9.80 (Windows NT 6.1; U; en) Presto/2.8.131 Version/11.11
          * @deprecated 4.0.0 Will be removed in the next major version
          */
         partition : function(arr, truth){
-            var ret = [[],[]];
-            Ext.each(arr, function(v, i, a) {
-                ret[ (truth && truth(v, i, a)) || (!truth && v) ? 0 : 1].push(v);
-            });
+            var ret = [[],[]],
+                a, v,
+                aLen = arr.length;
+
+            for (a = 0; a < aLen; a++) {
+                v = arr[a];
+                ret[ (truth && truth(v, a, arr)) || (!truth && v) ? 0 : 1].push(v);
+            }
+
             return ret;
         },
 
@@ -1047,15 +1083,21 @@ Opera 11.11 - Opera/9.80 (Windows NT 6.1; U; en) Presto/2.8.131 Version/11.11
          * @deprecated 4.0.0 Will be removed in the next major version
          */
         invoke : function(arr, methodName){
-            var ret = [],
-                args = Array.prototype.slice.call(arguments, 2);
-            Ext.each(arr, function(v,i) {
+            var ret  = [],
+                args = Array.prototype.slice.call(arguments, 2),
+                a, v,
+                aLen = arr.length;
+
+            for (a = 0; a < aLen; a++) {
+                v = arr[a];
+
                 if (v && typeof v[methodName] == 'function') {
                     ret.push(v[methodName].apply(v, args));
                 } else {
                     ret.push(undefined);
                 }
-            });
+            }
+
             return ret;
         },
 
@@ -1089,14 +1131,17 @@ Opera 11.11 - Opera/9.80 (Windows NT 6.1; U; en) Presto/2.8.131 Version/11.11
                 arrs = parts[0],
                 fn = parts[1][0],
                 len = Ext.max(Ext.pluck(arrs, "length")),
-                ret = [];
+                ret = [],
+                i,
+                j,
+                aLen;
 
-            for (var i = 0; i < len; i++) {
+            for (i = 0; i < len; i++) {
                 ret[i] = [];
                 if(fn){
                     ret[i] = fn.apply(fn, Ext.pluck(arrs, i));
                 }else{
-                    for (var j = 0, aLen = arrs.length; j < aLen; j++){
+                    for (j = 0, aLen = arrs.length; j < aLen; j++){
                         ret[i].push( arrs[j][i] );
                     }
                 }
@@ -1106,10 +1151,10 @@ Opera 11.11 - Opera/9.80 (Windows NT 6.1; U; en) Presto/2.8.131 Version/11.11
 
         /**
          * Turns an array into a sentence, joined by a specified connector - e.g.:
-         * 
+         *
          *     Ext.toSentence(['Adama', 'Tigh', 'Roslin']); //'Adama, Tigh and Roslin'
          *     Ext.toSentence(['Adama', 'Tigh', 'Roslin'], 'or'); //'Adama, Tigh or Roslin'
-         * 
+         *
          * @param {String[]} items The array to create a sentence from
          * @param {String} connector The string to use to connect the last two words.
          * Usually 'and' or 'or' - defaults to 'and'.
@@ -1117,13 +1162,15 @@ Opera 11.11 - Opera/9.80 (Windows NT 6.1; U; en) Presto/2.8.131 Version/11.11
          * @deprecated 4.0.0 Will be removed in the next major version
          */
         toSentence: function(items, connector) {
-            var length = items.length;
+            var length = items.length,
+                head,
+                tail;
 
             if (length <= 1) {
                 return items[0];
             } else {
-                var head = items.slice(0, length - 1),
-                    tail = items[length - 1];
+                head = items.slice(0, length - 1);
+                tail = items[length - 1];
 
                 return Ext.util.Format.format("{0} {1} {2}", head.join(", "), connector || 'and', tail);
             }
@@ -1136,7 +1183,7 @@ Opera 11.11 - Opera/9.80 (Windows NT 6.1; U; en) Presto/2.8.131 Version/11.11
          */
         useShims: isIE6
     });
-})();
+}());
 
 /**
  * Loads Ext.app.Application class and starts it up with given configuration after the page is ready.

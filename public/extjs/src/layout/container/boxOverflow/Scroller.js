@@ -74,10 +74,14 @@ Ext.define('Ext.layout.container.boxOverflow.Scroller', {
     
     constructor: function(layout, config) {
         var me = this;
-        
+
+        layout.preserveParallel = true;
         me.layout = layout;
         Ext.apply(me, config || {});
-        
+
+        // Dont pass the config so that it is not applied to 'this' again
+        me.mixins.observable.constructor.call(me);
+
         me.addEvents(
             /**
              * @event scroll
@@ -89,7 +93,7 @@ Ext.define('Ext.layout.container.boxOverflow.Scroller', {
         );
         me.scrollPosition = 0;
     },
-    
+
     getPrefixConfig: function() {
         var me = this;
         me.initCSSClasses();
@@ -139,14 +143,21 @@ Ext.define('Ext.layout.container.boxOverflow.Scroller', {
         var me = this,
             layout = me.layout,
             names = layout.getNames(),
-            methodName = 'get' + names.widthCap;
+            methodName = 'get' + names.widthCap,
+            result;
 
         me.captureChildElements();
         me.showScrollers();
-
-        return {
-            reservedSpace: me.beforeCt[methodName]() + me.afterCt[methodName]()
+        me.reservedSpace = me.beforeCt[methodName]() + me.afterCt[methodName]();
+        result = {
+            reservedSpace: me.reservedSpace
         };
+
+//      getMaxScrollPosition subtracts this. It only needs to be set during layout when the before and after scroller container
+//      widths have not been subtracted from the innerCt width.
+        me.reservedSpace = 0;
+
+        return result;
     },
 
     /**
@@ -216,7 +227,7 @@ Ext.define('Ext.layout.container.boxOverflow.Scroller', {
      */
     showScrollers: function() {
         var me = this;
-        
+
         me.captureChildElements();
         me.beforeScroller.show();
         me.afterScroller.show();
@@ -231,7 +242,7 @@ Ext.define('Ext.layout.container.boxOverflow.Scroller', {
      */
     hideScrollers: function() {
         var me = this;
-        
+
         if (me.beforeScroller !== undefined) {
             me.beforeScroller.hide();
             me.afterScroller.hide();
@@ -245,7 +256,7 @@ Ext.define('Ext.layout.container.boxOverflow.Scroller', {
      */
     destroy: function() {
         var me = this;
-        
+
         Ext.destroy(me.beforeRepeater, me.afterRepeater, me.beforeScroller, me.afterScroller, me.beforeCt, me.afterCt);
     },
 
@@ -289,7 +300,7 @@ Ext.define('Ext.layout.container.boxOverflow.Scroller', {
         afterMeth  = me.atExtremeAfter() ? 'addCls' : 'removeCls';
         beforeCls  = me.beforeScrollerCls + '-disabled';
         afterCls   = me.afterScrollerCls  + '-disabled';
-        
+
         me.beforeScroller[beforeMeth](beforeCls);
         me.afterScroller[afterMeth](afterCls);
         me.scrolling = false;
@@ -348,7 +359,9 @@ Ext.define('Ext.layout.container.boxOverflow.Scroller', {
             names = layout.getNames(),
             widthName = names.widthCap;
 
-        return layout.innerCt.dom['scroll' + widthName] - this.layout.innerCt['get' + widthName]();
+        // This may be called *during* a layout, in which case, the innerCt's width will be the full container width.
+        // In this situation, this.resevedWidth is set if space for the the scrollers needs subtracting from the innerCt width.
+        return layout.innerCt.dom['scroll' + widthName] - (this.layout.innerCt['get' + widthName]() - (this.reservedSpace || 0));
     },
 
     /**

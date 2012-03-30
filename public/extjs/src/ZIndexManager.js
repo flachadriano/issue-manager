@@ -208,7 +208,7 @@ Ext.define('Ext.ZIndexManager', {
                 viewSize = {
                     height: Math.max(document.body.scrollHeight, Ext.dom.Element.getDocumentHeight()),
                     width: Math.max(document.body.scrollWidth, document.documentElement.clientWidth)
-                }
+                };
             } else {
                 viewSize = maskTarget.getViewSize(true);
             }
@@ -271,7 +271,7 @@ Ext.define('Ext.ZIndexManager', {
      * @return {Ext.Component}
      */
     get : function(id) {
-        return typeof id == "object" ? id : this.list[id];
+        return id.isComponent ? id : this.list[id];
     },
 
    /**
@@ -349,7 +349,7 @@ Ext.define('Ext.ZIndexManager', {
             comp = stack[i];
             if (comp.isVisible()) {
                 this.tempHidden.push(comp);
-                comp.hide();
+                comp.el.hide();
             }
         }
     },
@@ -366,7 +366,7 @@ Ext.define('Ext.ZIndexManager', {
 
         for (; i < len; i++) {
             comp = tempHidden[i];
-            comp.show();
+            comp.el.show();
             comp.setPosition(comp.x, comp.y);
         }
         delete this.tempHidden;
@@ -471,11 +471,21 @@ Ext.define('Ext.ZIndexManager', {
     },
 
     destroy: function() {
-        var me = this;
-        
-        me.each(function(c) {
-            c.destroy();
-        });
+        var me   = this,
+            list = me.list,
+            comp,
+            id;
+
+        for (id in list) {
+            if (list.hasOwnProperty(id)) {
+                comp = list[id];
+
+                if (comp.isComponent) {
+                    comp.destroy();
+                }
+            }
+        }
+
         delete me.zIndexStack;
         delete me.list;
         delete me.container;

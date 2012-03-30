@@ -21,9 +21,9 @@ Ext.define('Ext.layout.component.Dock', {
 
     initializedBorders: -1,
 
-    horizontalCollapsePolicy: { width: true },
+    horizontalCollapsePolicy: { width: true, x: true },
 
-    verticalCollapsePolicy: { height: true },
+    verticalCollapsePolicy: { height: true, y: true },
 
     finishRender: function () {
         var me = this,
@@ -146,7 +146,7 @@ Ext.define('Ext.layout.component.Dock', {
             owner = me.owner,
             docked = me.getLayoutItems(),
             layoutContext = ownerContext.context,
-            len = docked.length,
+            dockedItemCount = docked.length,
             collapsedVert = false,
             collapsedHorz = false,
             dockedItems, i, item, itemContext, offsets,
@@ -171,21 +171,19 @@ Ext.define('Ext.layout.component.Dock', {
                 // Remove the collapsed class now, before layout calculations are done.
                 owner.removeClsWithUI(owner.collapsedCls);
                 ownerContext.lastCollapsedState = me.lastCollapsedState;
-            } 
+            }
         }
         me.lastCollapsedState = collapsed;
 
         ownerContext.dockedItems = dockedItems = [];
 
-        for (i = 0; i < len; i++) {
+        for (i = 0; i < dockedItemCount; i++) {
             item = docked[i];
-
             itemContext = layoutContext.getCmp(item);
             itemContext.dockedAt = { x: 0, y: 0 };
             itemContext.offsets = offsets = Ext.Element.parseBox(item.offsets || {});
             offsets.width = offsets.left + offsets.right;
             offsets.height = offsets.top + offsets.bottom;
-
             dockedItems.push(itemContext);
         }
 
@@ -222,17 +220,19 @@ Ext.define('Ext.layout.component.Dock', {
         if (ownerContext.collapsedVert) {
             ownerContext.heightModel = me.sizeModels.shrinkWrap;
         } else if (ownerContext.collapsedHorz) {
-            ownerContext.widthModel = me.sizeModels.shrinkWrap
+            ownerContext.widthModel = me.sizeModels.shrinkWrap;
         }
 
-        if (ownerContext.widthModel.shrinkWrap) {
+        if (ownerContext.widthModel.auto) {
+            if (ownerContext.widthModel.shrinkWrap) {
+                owner.el.setWidth(null);
+            }
             owner.body.setWidth(null);
-            owner.el.setWidth(null);
             if (frameBody) {
                 frameBody.setWidth(null);
             }
         }
-        if (ownerContext.heightModel.shrinkWrap) {
+        if (ownerContext.heightModel.auto) {
             owner.body.setHeight(null);
             //owner.el.setHeight(null); Disable this for now
             if (frameBody) {
@@ -406,6 +406,12 @@ Ext.define('Ext.layout.component.Dock', {
             item = itemContext.target,
             dock = item.dock, // left/top/right/bottom
             pos;
+
+        if(item.ignoreParentFrame && ownerContext.isCollapsingOrExpanding) {
+            // collapsed window header margins may differ from expanded window header margins
+            // so we need to make sure the old cached values are not used in axis calculations
+            itemContext.clearMarginCache();
+        }
 
         if (dock == axis.dockBegin) {
             if (axis.shrinkWrap) {
@@ -585,7 +591,8 @@ Ext.define('Ext.layout.component.Dock', {
             border = ownerContext.borderInfo,
             padding = ownerContext.paddingInfo,
             framing = ownerContext.framingInfo,
-            frameSize = padding[beginName] + border[beginName] + framing[beginName];
+            frameSize = padding[beginName] + border[beginName] + framing[beginName],
+            bodyContext = ownerContext.bodyContext;
 
         if (axis.shrinkWrap) {
             // Since items docked left/top on a shrinkWrap axis go into negative coordinates,
@@ -593,15 +600,15 @@ Ext.define('Ext.layout.component.Dock', {
             // (0,0).
             axis.delta = -axis.begin;  // either 0 or a positive number
 
-            ownerContext.bodyContext[setSizeMethod](axis.initialSize);
+            bodyContext[setSizeMethod](axis.initialSize);
 
             if (axis.ignoreFrameBegin) {
                 axis.delta -= border[beginName];
-                ownerContext.bodyContext.setProp(axis.posProp, -axis.begin - frameSize);
+                bodyContext.setProp(axis.posProp, -axis.begin - frameSize);
             } else {
                 size += frameSize;
                 axis.delta += padding[beginName] + framing[beginName];
-                ownerContext.bodyContext.setProp(axis.posProp, -axis.begin);
+                bodyContext.setProp(axis.posProp, -axis.begin);
             }
 
             if (!axis.ignoreFrameEnd) {
@@ -615,8 +622,8 @@ Ext.define('Ext.layout.component.Dock', {
             axis.delta = -border[axis.dockBegin]; // 'left' or 'top'
 
             // Body size is remaining space between ends of Axis.
-            ownerContext.bodyContext[setSizeMethod](size);
-            ownerContext.bodyContext.setProp(axis.posProp, axis.begin - frameSize);
+            bodyContext[setSizeMethod](size);
+            bodyContext.setProp(axis.posProp, axis.begin - frameSize);
         }
 
         return !isNaN(size);
@@ -776,13 +783,14 @@ Ext.define('Ext.layout.component.Dock', {
      * @return {Ext.Component[]} An array of components.
      * @protected
      */
-    getDockedItems: function (order, beforeBody) {
+    getDockedItems: function(order, beforeBody) {
         var me = this,
             all = me.owner.dockedItems.items,
             sort = all && all.length && order !== false,
+            renderOrder,
             dock, dockedItems, i, isBefore, length;
 
-        if (typeof beforeBody == 'undefined') {
+        if (beforeBody == null) {
             dockedItems = sort ? all.slice() : all;
         } else {
             dockedItems = [];
@@ -799,11 +807,23 @@ Ext.define('Ext.layout.component.Dock', {
         }
 
         if (sort) {
-            order = order || 'render';
+            renderOrder = (order = order || 'render') == 'render';
             Ext.Array.sort(dockedItems, function(a, b) {
-                var aw = me.getItemWeight(a, order),
-                    bw = me.getItemWeight(b, order);
+                var aw,
+                    bw;
 
+                // If the two items are on opposite sides of the body, they must not be sorted by any weight value:
+                // For rendering purposes, left/top *always* sorts before right/bottom
+                if (renderOrder && ((aw = me.owner.dockOrder[a.dock]) !== (bw = me.owner.dockOrder[b.dock]))) {
+
+                    // The two dockOrder values cancel out when two items are on opposite sides.
+                    if (!(aw + bw)) {
+                        return aw - bw;
+                    }
+                }
+
+                aw = me.getItemWeight(a, order);
+                bw = me.getItemWeight(b, order);
                 if ((aw !== undefined) && (bw !== undefined)) {
                     return aw - bw;
                 }
@@ -878,6 +898,16 @@ Ext.define('Ext.layout.component.Dock', {
         } 
     },
 
+    // @private override inherited.
+    // We need to render in the correct order, top/left before bottom/right
+    renderChildren: function() {
+        var me = this,
+            items = me.getDockedItems(),
+            target = me.getRenderTarget();
+
+        me.renderItems(items, target);
+    },
+
     /**
      * @protected
      * Render the top and left docked items before any existing DOM nodes in our render target,
@@ -886,49 +916,56 @@ Ext.define('Ext.layout.component.Dock', {
      * Our collection of docked items will already be ordered via Panel.getDockedItems().
      */
     renderItems: function(items, target) {
-        var cns = target.dom.childNodes,
-            cnsLn = cns.length,
-            ln = items.length,
-            domLn = 0,
-            i, j, cn, item;
+        var me = this,
+            dockedItemCount = items.length,
+            itemIndex = 0,
+            correctPosition = 0,
+            item,
+            staticNodeCount = 0,
+            targetNodes = me.getRenderTarget().dom.childNodes,
+            targetChildCount = targetNodes.length,
+            i, j, targetChildNode, item;
 
         // Calculate the number of DOM nodes in our target that are not our docked items
-        for (i = 0; i < cnsLn; i++) {
-            cn = Ext.get(cns[i]);
-            for (j = 0; j < ln; j++) {
+        for (i = 0, j = 0; i < targetChildCount; i++) {
+            targetChildNode = targetNodes[i];
+            if (Ext.fly(targetChildNode).hasCls('x-resizable-handle')) {
+                break;
+            }
+            for (j = 0; j < dockedItemCount; j++) {
                 item = items[j];
-                if (item.rendered && (cn.id == item.el.id || cn.contains(item.el.id))) {
+                if (item.rendered && item.el.dom === targetChildNode) {
                     break;
                 }
             }
-
-            if (j === ln) {
-                domLn++;
+            // Walked off the end of the docked items without matching the found child node;
+            // Then it's a static node.
+            if (j === dockedItemCount) {
+                staticNodeCount++;
             }
         }
 
         // Now we go through our docked items and render/move them
-        for (i = 0, j = 0; i < ln; i++, j++) {
-            item = items[i];
+        for (; itemIndex < dockedItemCount; itemIndex++, correctPosition++) {
+            item = items[itemIndex];
 
-            // If we're now at the right/bottom docked item, we jump ahead in our
-            // DOM position, just past the existing DOM nodes.
+            // If we're now at the first right/bottom docked item, we jump over the body element.
             //
             // TODO: This is affected if users provide custom weight values to their
             // docked items, which puts it out of (t,l,r,b) order. Avoiding a second
             // sort operation here, for now, in the name of performance. getDockedItems()
             // needs the sort operation not just for this layout-time rendering, but
             // also for getRefItems() to return a logical ordering (FocusManager, CQ, et al).
-            if (i === j && (item.dock === 'right' || item.dock === 'bottom')) {
-                j += domLn;
+            if (itemIndex === correctPosition && (item.dock === 'right' || item.dock === 'bottom')) {
+                correctPosition += staticNodeCount;
             }
 
             // Same logic as Layout.renderItems()
             if (item && !item.rendered) {
-                this.renderItem(item, target, j);
+                me.renderItem(item, target, correctPosition);
             }
-            else if (!this.isValidParent(item, target, j)) {
-                this.moveItem(item, target, j);
+            else if (!me.isValidParent(item, target, correctPosition)) {
+                me.moveItem(item, target, correctPosition);
             }
         }
     },

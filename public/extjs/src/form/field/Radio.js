@@ -179,7 +179,7 @@ Ext.define('Ext.form.field.Radio', {
 
     /**
      * @property {Boolean} isRadio
-     * `true` in this class to identify an objact as an instantiated Radio, or subclass thereof.
+     * `true` in this class to identify an object as an instantiated Radio, or subclass thereof.
      */
     isRadio: true,
 
@@ -266,15 +266,22 @@ Ext.define('Ext.form.field.Radio', {
 
     // inherit docs
     onChange: function(newVal, oldVal) {
-        var me = this;
+        var me = this,
+            r, rLen, radio, radios;
+
         me.callParent(arguments);
 
         if (newVal) {
-            me.getManager().getByName(me.name, me.getFormId()).each(function(item){
-                if (item !== me) {
-                    item.setValue(false);
+            radios = me.getManager().getByName(me.name, me.getFormId()).items;
+            rLen   = radios.length;
+
+            for (r = 0; r < rLen; r++) {
+                radio = radios[r];
+
+                if (radio !== me) {
+                    radio.setValue(false);
                 }
-            }, me);
+            }
         }
     },
 

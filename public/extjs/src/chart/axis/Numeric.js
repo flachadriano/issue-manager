@@ -156,13 +156,16 @@ Ext.define('Ext.chart.axis.Numeric', {
     doConstrain: function () {
         var me = this,
             store = me.chart.store,
+            items = store.data.items,
+            d, dLen, record,
             series = me.chart.series.items,
             fields = me.fields,
             ln = fields.length,
             range = me.getRange(),
             min = range.min, max = range.max, i, l, excludes = [],
             useAcum = false,
-            value, data = [];
+            value, data = [],
+            addRecord;
 
         for (i = 0, l = series.length; i < l; i++) {
             excludes[i] = series[i].__excludes;
@@ -170,22 +173,29 @@ Ext.define('Ext.chart.axis.Numeric', {
             //constrain doesn't apply to them (in this way).
             useAcum = useAcum || series[i].type === 'area';
         }
-        store.each(function(record) {
+        for (d = 0, dLen = items.length; d < dLen; d++) {
+            addRecord = true;
+            record = items[d];
             for (i = 0; i < ln; i++) {
+                addRecord = true;
                 if (excludes[i]) {
                     continue;
                 }
                 value = record.get(fields[i]);
 
                 if (!useAcum && +value < +min) {
-                    return;
+                    addRecord = false;
+                    break;
                 }
                 if (!useAcum && +value > +max) {
-                    return;
+                    addRecord = false;
+                    break;
                 }
             }
-            data.push(record);
-        });
+            if (addRecord) {
+                data.push(record);
+            }
+        }
         me.chart.substore = Ext.create('Ext.data.JsonStore', { model: store.model, data: data });
     },
     /**

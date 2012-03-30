@@ -233,24 +233,29 @@ Ext.define('Ext.view.Table', {
      */
     initFeatures: function() {
         var me = this,
-            i = 0,
+            i,
             features,
+            feature,
             len;
 
-        me.features = me.features || [];
         features = me.features;
+        me.features = [];
         len = features.length;
 
         me.featuresMC = new Ext.util.MixedCollection();
-        for (; i < len; i++) {
+        for (i = 0; i < len; i++) {
             // ensure feature hasnt already been instantiated
-            if (!features[i].isFeature) {
-                features[i] = Ext.create('feature.' + features[i].ftype, features[i]);
+            feature = features[i];
+
+            if (!feature.isFeature) {
+                feature = Ext.create('feature.' + feature.ftype, feature);
             }
+            me.features[i] = feature;
+
             // inject a reference to view
-            features[i].view = me;
-            me.featuresMC.add(features[i]);
-            features[i].init();
+            feature.view = me;
+            me.featuresMC.add(feature);
+            feature.init();
         }
     },
 
@@ -326,7 +331,9 @@ Ext.define('Ext.view.Table', {
             feature,
             j = 0,
             jln,
-            rowParams;
+            rowParams,
+            rec,
+            cls;
 
         jln = preppedRecords.length;
         // process row classes, rowParams has been deprecated and has been moved
@@ -334,7 +341,9 @@ Ext.define('Ext.view.Table', {
         if (this.getRowClass) {
             for (; j < jln; j++) {
                 rowParams = {};
-                preppedRecords[j].rowCls = this.getRowClass(records[j], j, rowParams, this.store);
+                rec = preppedRecords[j];
+                cls = rec.rowCls || '';
+                rec.rowCls = this.getRowClass(records[j], j, rowParams, this.store) + ' ' + cls;
                 //<debug>
                 if (rowParams.alt) {
                     Ext.Error.raise("The getRowClass alt property is no longer supported.");
@@ -370,6 +379,22 @@ Ext.define('Ext.view.Table', {
     },
 
     /**
+     * In FF10, flex columns transitioning from hidden to visible may not always be
+     * displayed properly initially.  Simply re-measuring the width after the styling
+     * changes take place seems to be enough to poke the browser into doing it's thing
+     * @private
+     */
+    forceReflow: Ext.isGecko10
+        ? function() {
+            var el = this.el.down('table'),
+                width;
+            if (el) {
+                width = el.getWidth();
+            }
+        }
+        : Ext.emptyFn,
+
+    /**
      * When a header is resized, setWidth on the individual columns resizer class,
      * the top level table, save/restore scroll state, generate a new template and
      * restore focus to the grid view's element so that keyboard navigation
@@ -392,6 +417,7 @@ Ext.define('Ext.view.Table', {
             if (!suppressFocus) {
                 me.el.focus();
             }
+            me.forceReflow();
         }
     },
 
@@ -432,16 +458,16 @@ Ext.define('Ext.view.Table', {
     refreshHeight: function() {
         var cmp = this.up('tablepanel');
 
-        // Suspend layouts in case the superclass requests a layout. We might too, so they must be coalescsed.
+        // Suspend layouts in case the superclass requests a layout. We might too, so they
+        // must be coalescsed.
         Ext.suspendLayouts();
-        this.callParent(arguments);
 
-        // Do not perform layouts on refresh if the grid is monitoring scroll using a verticalScroller in order
-        // to buffer refreshes of the view from the Store's prefetch buffer. In the case of infinite scrolling,
-        // if there's no scrolling, there will be no refreshes, if there are refreshes, there will definitely be a scrollbar.
-        if (!cmp.verticalScroller && cmp && (cmp = cmp.child('headercontainer')) && Ext.getScrollbarSize().width && cmp.child('[flex]')) {
+        this.callParent();
+
+        if (cmp && Ext.getScrollbarSize().width) {
             cmp.updateLayout();
         }
+
         Ext.resumeLayouts(true);
     },
 
@@ -524,14 +550,12 @@ Ext.define('Ext.view.Table', {
     },
 
     onCellFocus: function(position) {
-        //var cell = this.getCellByPosition(position);
         this.focusCell(position);
     },
 
     getCellByPosition: function(position) {
         var row    = position.row,
             column = position.column,
-            store  = this.store,
             node   = this.getNode(row),
             header = this.headerCt.getHeaderAtIndex(column),
             cellSelector,
@@ -547,8 +571,7 @@ Ext.define('Ext.view.Table', {
     // GridSelectionModel invokes onRowFocus to 'highlight'
     // the last row focused
     onRowFocus: function(rowIdx, highlight, supressFocus) {
-        var me = this,
-            row = me.getNode(rowIdx);
+        var me = this;
 
         if (highlight) {
             me.addRowCls(rowIdx, me.focusedItemCls);
@@ -666,7 +689,7 @@ Ext.define('Ext.view.Table', {
             oldCells, newCells, len, i,
             columns = me.headerCt.getGridColumns(),
             overItemCls = me.overItemCls,
-            isHovered, fieldName, row;
+            isHovered, row;
 
         if (index > -1) {
             newRow = me.bufferRender([record], index)[0];
@@ -684,10 +707,8 @@ Ext.define('Ext.view.Table', {
             // row is the element that contains the cells.  This will be a different element from oldRow when using a rowwrap feature
             row = oldCells[0].parentNode;
             for (i = 0; i < len; i++) {
-                fieldName = columns[i].dataIndex;
-
                 // If the field at this column index was changed, replace the cell.
-                if (me.shouldUpdateCell(changedFieldNames, fieldName)) {
+                if (me.shouldUpdateCell(columns[i], changedFieldNames)) {
                     row.insertBefore(newCells[i], oldCells[i]);
                     row.removeChild(oldCells[i]);
                 }
@@ -702,8 +723,13 @@ Ext.define('Ext.view.Table', {
 
     },
     
-    shouldUpdateCell: function(changedFieldNames, fieldName){
-        return !changedFieldNames || Ext.Array.contains(changedFieldNames, fieldName);
+    shouldUpdateCell: function(column, changedFieldNames){
+        // Though this may not be the most efficient, a renderer could be dependent on any field in the
+        // store, so we must always update the cell
+        if (column.hasCustomRenderer) {
+            return true;
+        }
+        return !changedFieldNames || Ext.Array.contains(changedFieldNames, column.dataIndex);
     },
 
     /**

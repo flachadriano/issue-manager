@@ -545,7 +545,9 @@ myElement.dom.className = Ext.core.Element.removeCls(this.initialClasses, 'x-inv
     this.addStatics({
         /**
          * @class Ext.dom.AbstractElement.Fly
-         * A non-persistent wrapper for a DOM element which may be used to execute methods of {@link Ext.Dom.Element}
+         * @extends Ext.dom.AbstractElement
+         *
+         * A non-persistent wrapper for a DOM element which may be used to execute methods of {@link Ext.dom.Element}
          * upon a DOM element without creating an instance of {@link Ext.dom.Element}.
          *
          * A **singleton** instance of this class is returned when you use {@link Ext#fly}
@@ -605,6 +607,7 @@ myElement.dom.className = Ext.core.Element.removeCls(this.initialClasses, 'x-inv
          * internally Ext uses "_global")
          * @return {Ext.dom.AbstractElement.Fly} The singleton flyweight object (or null if no matching element was found)
          * @static
+         * @member Ext.dom.AbstractElement
          */
         fly: function(dom, named) {
             var fly = null,
@@ -668,7 +671,7 @@ myElement.dom.className = Ext.core.Element.removeCls(this.initialClasses, 'x-inv
                 return asDom ? dom : (dom ? Ext.get(dom) : null);
             };
         }
-    })(this.prototype);
+    }(this.prototype));
 });
 
-})();
+}());
