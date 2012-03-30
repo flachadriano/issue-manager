@@ -35,13 +35,20 @@ Ext.define('IM.view.accessPermission.Update', {
         ],
         height  : 200
     },{
-        xtype   : 'label',
-        text    : 'Acessos - Permite cadastro de permissões de acesso',
-        anchor  : '0'
-    },{
-        xtype   : 'label',
-        text    : 'Cadastros - Permite alterações dos cadastros',
-        anchor  : '0'
+        xtype   : 'container',
+        margin      : '10 0 0 0',
+        layout  : {
+            type    : 'vbox',
+            align   : 'stretch'
+        },
+        defaults    : {
+            xtype   : 'label'
+        },
+        items   : [{
+            text    : 'Acessos - Permite cadastro de permissões de acesso'
+        },{
+            text    : 'Cadastros - Permite alterações dos cadastros'
+        }]
     }],
 
    	buttons	: [{
