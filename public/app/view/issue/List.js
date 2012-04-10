@@ -6,13 +6,13 @@ Ext.define('IM.view.issue.List', {
 
     items   : [{
 
-        // main panel
+        // main
         xtype   : 'container',
         margin  : '5 5 5 5',
         layout  : 'border',
         items   : [{
 
-            // topo
+            // top
             xtype   : 'container',
             region  : 'north',
             layout  : 'anchor',
@@ -27,7 +27,7 @@ Ext.define('IM.view.issue.List', {
                 items   : [{
                     xtype   : 'combobox',
                     width   : 370
-                },"->",{
+                },'->',{
                     text    : 'Usuário',
                     width   : 100
                 },{
@@ -40,17 +40,59 @@ Ext.define('IM.view.issue.List', {
                     text    : 'Sair',
                     width   : 100
                 }]
+            },{
+
+                // filters - module and function
+                xtype   : 'container',
+                layout  : 'column',
+                items   : [{
+                    xtype       : 'combobox',
+                    columnWidth : .5,
+                    fieldLabel  : 'Módulo'
+                },{
+                    xtype       : 'combobox',
+                    columnWidth : .5,
+                    fieldLabel  : 'Função'
+                }]
+            },{
+
+                // filters - title and search button
+                xtype   : 'container',
+                layout  : 'column',
+                items   : [{
+                    xtype       : 'textfield',
+                    columnWidth : 1,
+                    fieldLabel  : 'Título'
+                },{
+                    xtype   : 'button',
+                    text    : 'Pesquisar'
+                }]
+            },{
+
+                // grid buttons
+                xtype   : 'toolbar',
+                layout  : 'column',
+                items   : [{
+                    xtype   : 'button',
+                    text    : 'Cadastrar solicitação'
+                },{
+                    xtype   : 'button',
+                    text    : 'Atualizar listagem'
+                },{
+                    xtype   : 'button',
+                    text    : 'Editar solicitação'
+                }]
             }]
         },{
+
             // issues
             xtype   : 'gridpanel',
             region  : 'center',
             columns : [
-                {header: 'Nome'},
-                {header: 'Login'},
-                {header: 'Acessos'},
-                {header: 'Cadastros'},
-                {header: 'Remover'}
+                {header: 'Prioridade'},
+                {header: 'Título'},
+                {header: 'Módulo'},
+                {header: 'Função'}
             ]
         }]
     }]
