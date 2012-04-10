@@ -1,72 +1,57 @@
 Ext.define('IM.view.issue.List', {
-	extend	: 'IM.view.Template',
+	extend	: 'Ext.container.Viewport',
 	alias	: 'widget.issuelist',
 
+    layout  : 'fit',
+
     items   : [{
-        defaults    : {
-            xtype       : 'container',
-            layout      : {
-                type    : 'hbox'
-            }
-        },
-        items       : [{
-            defaults    : {
-                xtype   : 'button'
-            },
-            items       : [{
-                xtype       : 'combobox',
-                emptyText   : 'Selecione um projeto'
-            },{
-                text        : 'Usuário'
-            },{
-                text        : 'Cadastros'
-            },{
-                text        : 'Permissões'
-            },{
-                text        : 'Sair'
-            }]
-        },{
-            defaults    : {
-                xtype   : 'combobox'
-            },
-            items       : [{
-                emptyText   : 'Selecione um módulo'
-            },{
-                emptyText   : 'Selecione uma função'
-            }]
-        },{
-            items       : [{
-                xtype       : 'textfield',
-                fieldLabel  : 'Título'
-            },{
-                xtype       : 'button',
-                text        : 'Pesquisar'
-            }]
-        },{
-            defaults    : {
-                xtype   : 'button'
-            },
-            items       : [{
-                text    : 'Cadastrar solicitação',
-                action  : 'create'
-            },{
-                text    : 'Atualizar listagem'
-            },{
-                text    : 'Editar'
-            }]
-        },{
+
+        // main panel
+        xtype   : 'container',
+        margin  : '5 5 5 5',
+        layout  : 'border',
+        items   : [{
+
+            // topo
+            xtype   : 'container',
+            region  : 'north',
+            layout  : 'anchor',
             items   : [{
-                xtype   : 'gridpanel',
-                columns : [
-                    {header: 'Nome'},
-                    {header: 'Login'},
-                    {header: 'Acessos'},
-                    {header: 'Cadastros'},
-                    {header: 'Remover'}
-                ],
-                width   : 550,
-                height  : 200
+
+                // tools
+                xtype   : 'toolbar',
+                region  : 'north',
+                defaults: {
+                    xtype   : 'button'
+                },
+                items   : [{
+                    xtype   : 'combobox',
+                    width   : 370
+                },"->",{
+                    text    : 'Usuário',
+                    width   : 100
+                },{
+                    text    : 'Cadastros',
+                    width   : 100
+                },{
+                    text    : 'Permissões',
+                    width   : 100
+                },{
+                    text    : 'Sair',
+                    width   : 100
+                }]
             }]
+        },{
+            // issues
+            xtype   : 'gridpanel',
+            region  : 'center',
+            columns : [
+                {header: 'Nome'},
+                {header: 'Login'},
+                {header: 'Acessos'},
+                {header: 'Cadastros'},
+                {header: 'Remover'}
+            ]
         }]
     }]
 });
