@@ -1,12 +1,12 @@
 Ext.define('IM.controller.AccessPermissions', {
     extend  : 'IM.controller.Controller',
-    views   : ['accessPermission.Update'],
+    views   : ['accessPermission.Edit'],
     
 // init
     init: function()
     {
        this.control({
-            'acesspermissionupdate button[action=create]': {
+            'acesspermissionedit button[action=create]': {
                 click: this.onClickBtnCreate
             }
         });
@@ -14,7 +14,7 @@ Ext.define('IM.controller.AccessPermissions', {
   
 // actions
     update: function() {
-        this.render('acesspermissionupdate');
+        this.render('acesspermissionedit');
     },
 
 // listeners

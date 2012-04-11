@@ -1,6 +1,6 @@
-Ext.define('IM.view.issue.View', {
+Ext.define('IM.view.issue.Edit', {
 	extend	: 'IM.view.Template',
-	alias	: 'widget.issueview',
+	alias	: 'widget.issueedit',
 
     items   : [{
         defaults    : {

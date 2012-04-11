@@ -32,7 +32,7 @@ Ext.define('IM.controller.Projects', {
 
 // listeners
     onClickBtnCreate: function(button) {
-    	this.render('acesspermissionupdate');
+    	this.render('acesspermissionedit');
    },
 
     onClickBtnCancel: function(button) {

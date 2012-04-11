@@ -1,6 +1,6 @@
-Ext.define('IM.view.accessPermission.Update', {
+Ext.define('IM.view.accessPermission.Edit', {
 	extend	: 'IM.view.Template',
-	alias	: 'widget.acesspermissionupdate',
+	alias	: 'widget.acesspermissionedit',
 
 	title	: 'Permissões de acesso',
     

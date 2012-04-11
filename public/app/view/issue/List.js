@@ -8,12 +8,12 @@ Ext.define('IM.view.issue.List', {
 
         // main
         xtype   : 'container',
-        margin  : '5 5 5 5',
         layout  : 'border',
         items   : [{
 
             // top
             xtype   : 'container',
+            margin  : '5 5 5 5',
             region  : 'north',
             layout  : 'anchor',
             items   : [{
@@ -29,12 +29,15 @@ Ext.define('IM.view.issue.List', {
                     width   : 370
                 },'->',{
                     text    : 'Usuário',
+                    action  : 'edit_user',
                     width   : 100
                 },{
                     text    : 'Cadastros',
+                    action  : 'edit_records',
                     width   : 100
                 },{
                     text    : 'Permissões',
+                    action  : 'edit_permissions',
                     width   : 100
                 },{
                     text    : 'Sair',
@@ -45,13 +48,13 @@ Ext.define('IM.view.issue.List', {
                 // filters - module and function
                 xtype   : 'container',
                 layout  : 'column',
-                items   : [{
+                defaults: {
                     xtype       : 'combobox',
-                    columnWidth : .5,
+                    columnWidth : .5
+                },
+                items   : [{
                     fieldLabel  : 'Módulo'
                 },{
-                    xtype       : 'combobox',
-                    columnWidth : .5,
                     fieldLabel  : 'Função'
                 }]
             },{
@@ -65,22 +68,25 @@ Ext.define('IM.view.issue.List', {
                     fieldLabel  : 'Título'
                 },{
                     xtype   : 'button',
+                    margin  : '0 0 0 5',
                     text    : 'Pesquisar'
                 }]
             },{
 
                 // grid buttons
                 xtype   : 'toolbar',
-                layout  : 'column',
+                defaults: {
+                    xtype   : 'button'
+                },
                 items   : [{
-                    xtype   : 'button',
-                    text    : 'Cadastrar solicitação'
+                    text    : 'Cadastrar solicitação',
+                    action  : 'create_issue'
                 },{
-                    xtype   : 'button',
-                    text    : 'Atualizar listagem'
+                    text    : 'Atualizar listagem',
+                    action  : 'reload_issues'
                 },{
-                    xtype   : 'button',
-                    text    : 'Editar solicitação'
+                    text    : 'Editar solicitação',
+                    action  : 'edit_issue'
                 }]
             }]
         },{

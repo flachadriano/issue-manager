@@ -10,20 +10,23 @@ Ext.application({
 	},
 	requires: [
 		'Ext.ux.Router',
-		'IM.override.TextField'
+		'IM.override.TextField',
+		'IM.override.Toolbar'
 	],
     controllers			: [
     	'AccessPermissions',
     	'Issues',
     	'Projects',
+		'Users',
 		'Viewport'
 	],
     routes				: {
     	''							: 'viewport#index',
 		'projects/create'			: 'projects#create',
 		'projects/administration'	: 'projects#administration',
-		'access_permissions/update'	: 'accessPermissions#update',
+		'access_permissions/edit'	: 'accessPermissions#update',
 		'issues/list'				: 'issues#list',
-		'issues/view'				: 'issues#view'
+		'issues/edit'				: 'issues#update',
+		'users/edit'				: 'users#update'
     }
 });
