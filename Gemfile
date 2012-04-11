@@ -40,9 +40,10 @@ group :development, :test do
   	gem 'simplecov'
 
 	# To use debugger
-	gem 'ruby-debug19', :require => 'ruby-debug'
-  	#gem 'ruby-debug19', '0.11.6', :platforms => :ruby_19
-  	gem 'ruby-debug-base19x', '~> 0.11.30.pre4'
+	gem 'debugger'
+	# gem 'ruby-debug19', :require => 'ruby-debug'
+  	# gem 'ruby-debug19', '0.11.6', :platforms => :ruby_19
+  	# gem 'ruby-debug-base19x', '~> 0.11.30.pre4'
 	# gem 'ruby-debug19', :require => 'ruby-debug'
 	# gem 'linecache19', :git => 'https://github.com/mark-moseley/linecache.git' 
 	# gem 'ruby-debug-base19', :git => 'https://github.com/mark-moseley/ruby-debug.git'
